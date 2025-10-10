@@ -11,9 +11,17 @@ from apps.factories import \
     VariantAttributeFactory,
     CategoryFactory
 )
+from django.conf import settings
+import tempfile
 
 pytestmark = pytest.mark.django_db
 
+@pytest.fixture(autouse=True)
+def media_tmp_dir(settings):
+    tmp_dir = tempfile.mkdtemp()
+    settings.MEDIA_ROOT = tmp_dir
+    yield tmp_dir 
+    
 @pytest.fixture
 def sample_products():
     """Create a set of sample produtcs for testing"""
