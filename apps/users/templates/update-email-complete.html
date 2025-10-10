@@ -1,0 +1,23 @@
+{% extends "base-users.html" %}
+
+{% block title %} Sucessful signup {% endblock title %}
+
+{% block content %}
+
+<br>
+
+{% if error %}
+    {{ error }}
+    <br>
+    <br>
+{% elif success %}
+<h2>Update email successful</h2>
+<p>{{ success }} </p>
+<br>
+{% endif %}
+
+<a href="{% url 'profile' %}" >Click here to go back to your profile </a>
+<br>
+<br>
+
+{% endblock content %}

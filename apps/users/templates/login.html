@@ -1,0 +1,77 @@
+{% extends 'base-users.html' %}
+
+{% block title %} Login {% endblock title %}
+
+{% block content %}
+
+<!-- Login card -->
+  <div class="container" 
+       style="min-height: 100vh;
+           justify-content: center;
+           align-items: center;
+          display: flex;
+          "
+  >
+
+    <div class="card login-card p-4 bg-white col-lg-4 col-sm-8 col-xs-12" style="border-radius : 20px">
+        <h4 class="text-center mb-3">Welcome back</h4>
+        <small style="color:gray;font-style:italic;font-weight: 500;">Please log in into your account</small>
+        <br>
+        
+        <button class="btn btn-warning">
+            <i class="bi bi-google me-2" style="color:white"></i>
+            <a class="text-white text-decoration-none" href="{% url 'social:begin' 'google-oauth2' %}">Sign in with Google</a>
+        
+          </button>
+          
+        <br>
+        <div class="text-center text-muted mb-2">OR</div>   
+        <br>
+        <form id="loginForm" method="post">
+          {% csrf_token %}
+
+          <div class="form-floating mb-3">   
+            {{ form.identifier }}
+            <label for="password">Username or email</label>
+          </div>
+
+          <div class="form-floating mb-3">   
+            {{ form.password }}
+            <label for="password">Password</label>
+            <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3" id="togglePassword" style="cursor: pointer;"></i>
+            
+          </div>
+          
+          {% if error %}
+              <br>
+              <div>
+                  <p class="error">{{ error }}</p>
+              </div>
+            {% endif %}
+            
+          <br>
+          <!-- Login Button -->
+          <div class="d-grid mb-3">
+            <button class="btn btn-primary" style="border-radius:20px" type="submit">Sign in</button>
+          </div>
+          
+          
+          <!-- Forgot password -->
+          <small style="color:gray;font-style:italic;font-weight: 400;">
+              <a href="{% url 'password_reset' %}" id="forgot" style="position:relative; float:right" class="text-dark text-decoration-none">Forgot password ?</a>
+          </small>
+          <br>
+          
+        </form>
+    
+        <div class="text-center mt-3">
+          <small style="color:gray;font-style:italic;font-weight: 400;">Don't have an account ? <a href="{% url 'signup' %}">Signup now</a></small>
+        </div>
+      </div>
+    
+    </div>  
+    <br>
+    <br>
+  
+
+{% endblock content %}
