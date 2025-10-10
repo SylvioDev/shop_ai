@@ -1,0 +1,121 @@
+{% extends 'base-users.html '%}
+
+{% block title %} Edit Profile {% endblock title%}
+
+{% block content %}
+
+  <div class="container py-5">
+    <div class="row g-4">
+      <!-- Left profile card -->
+      <div class="col-md-4">
+        <div class="card-profile">
+
+          {% if user.userprofile.profile_picture %}
+            <img class="profile-pic" id="profile-pic" src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" />
+          {% else %}
+            <img id="profile-pic" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.PKlD9uuBX0m4S8cViqXZHAHaHa%3Fr%3D0%26pid%3DApi&f=1&ipt=d21b0bf7247a83a119e6d7e81a158c7613ca0d57822822d896676e1e229758ba&ipo=images" alt="Profile Picture"/>
+          {% endif %}
+          
+          <h5 class="mt-2">{{ user.username }}</h5>
+          <p class="text-muted">@{{ user.username }} </p>
+
+        <form method="post" enctype="multipart/form-data">
+
+          <input accept="image/*" name="profile-pic" type="file" class="form-control my-3" value="Upload a photo" id="file-upload"/>
+          
+          <label for="file-upload" class="custom-file-upload" >
+            <svg xmlns="http://www.w3.org/2000/svg" 
+                 width="20" height="20" fill="currentColor" 
+                 viewBox="0 0 16 16" class="camera-icon">
+              <path d="M10.5 3a.5.5 0 0 1 .5.5V4h1a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h1v-.5a.5.5 0 0 1 .5-.5h6zM8 6a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
+              <path d="M8 7a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
+            </svg>
+            Upload a Photo
+          </label>
+          
+          <!--<input id="file-upload" name="profile-pic" type="file" />-->
+          
+          <br>
+          <br>
+          <label class="text-muted small" id="filename" ></label>
+          <br>
+          <br>
+          <p class="text-muted small">
+            Upload a new avatar. Larger image will be resized automatically.<br/>
+            Maximum upload size is 5 MB.
+          </p>
+          <hr/>
+          <p class="text-muted small">Member Since : <strong>{{ membership_date }}</strong></p>
+        </div>
+      </div>
+
+      <!-- Right form card -->
+      <div class="col-md-8">
+        <div class="tab-content">
+          <h4 class="mb-4">Edit Profile</h4>
+
+            {% csrf_token %}
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="full_name" class="form-control" value="{{ full_name }}" disabled/>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" value="{{ user.username }}" required />
+              </div>
+            </div>
+
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">First Name</label>
+                <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}" required/>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="last_name" class="form-control" value="{{ user.last_name}}" required />
+              </div>
+            </div>
+
+            
+            
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <label class="form-label">Facebook Username</label>
+                <input type="text" name="facebook" class="form-control" value = "{{ user.userprofile.social_media_username }}" placeholder="Facebook Username" />
+              </div>
+
+            </div>
+
+            <div class="text-end">
+              <button type="submit" class="btn btn-update">
+                Update Info
+                <i class="bi bi-save"></i>
+                
+              </button>
+              
+            </div>
+          </form>
+          
+          <div class="mt-6 border-t pt-4 text-sm text-gray-600">
+            <p>If you want to change your password or email:</p>
+            <ul class="mt-2 space-y-1">
+                <li>
+                    <a href="{% url 'password_reset' %}" class="text-blue-600 hover:underline">Change Password</a>
+                </li>
+                <li>
+                    <a href="{% url 'update-email' %}" class="text-blue-600 hover:underline">Change Email</a>
+                </li>
+            </ul>
+        </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+{% endblock content %}
+

@@ -1,0 +1,31 @@
+
+.error{
+    color : #f44336;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+#forgot {
+    position:absolute;
+    float : right;
+    font-style: italic;
+
+}
+
+.social-login {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+#signin {
+    background-color: dodgerblue;
+    
+}
+
+.small-text {
+    color:gray;font-style:italic;font-weight: 500;
+}
+
+

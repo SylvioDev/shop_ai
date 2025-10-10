@@ -1,0 +1,27 @@
+from django.db import models
+from django.contrib.auth.models import User
+from django.db import models
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+def user_directory_path(instance, filename):
+    return f'media/profile_pics/user_{instance.user.id}/{filename}'
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    profile_picture = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
+    social_media_username = models.CharField(null=True, max_length=100)
+    reset_token_used = models.BooleanField(default=False)
+    def __str__(self):
+        return f'{self.user.username} Profile' 
+
+class PendingEmailChange(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    new_email = models.EmailField()
+    token = models.CharField(max_length=256, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        from datetime import timedelta, timezone, datetime
+        return self.created_at < datetime.now(timezone.utc) - timedelta(hours=1)

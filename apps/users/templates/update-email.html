@@ -1,0 +1,36 @@
+{% extends 'base-users.html' %}
+
+{% block title %} Email update {% endblock title%}
+
+{% block content %}
+<br>
+<div class="container col-lg-6 col-xs-12 col-sm-8">
+    <form class="form-control" method="post"/>
+        {% csrf_token %}
+        <br>
+        <h6>Enter your new e-mail address below : </h6>
+        <br>
+        <input type="text" name="new_email" class="form-control input-sm" placeholder="user@email.com ..." required>
+        <br>
+        {% if error %}
+            <p style="color:red">{{ error }}</p>
+            <br>
+        {% endif%}
+
+        <button type="submit" class="btn btn-primary">
+            Send Confirmation Email Link
+        <i class="bi bi-send"></i>
+        </button>
+        <br>
+        <br>
+    </form>
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+{% endblock content %}

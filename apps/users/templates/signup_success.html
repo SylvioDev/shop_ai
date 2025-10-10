@@ -1,0 +1,19 @@
+{% extends "base-users.html" %}
+
+{% block title %} Successful signup {% endblock title %}
+
+{% block content %}
+
+<br>
+<h2>Registration Successful</h2>
+{% if error %}
+    {{ error }}
+{% else %}
+<p>Welcome, {{ user.username }}! Your account has been activated. </p>
+{% endif %}
+
+<a href="{% url 'login' %}" >Click here to log in </a>
+<br>
+<br>
+
+{% endblock content %}
