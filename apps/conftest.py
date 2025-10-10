@@ -13,14 +13,23 @@ from apps.factories import \
 )
 from django.conf import settings
 import tempfile
+import shutil
 
 pytestmark = pytest.mark.django_db
 
-@pytest.fixture(autouse=True)
-def media_tmp_dir(settings):
+@pytest.fixture(scope="session", autouse=True)
+def media_tmp_dir():
+    """
+    Overrides Django's MEDIA_ROOT to a temporary directory for tests.
+    Automatically cleans up after the test session.
+    """
     tmp_dir = tempfile.mkdtemp()
+    original_media_root = settings.MEDIA_ROOT
     settings.MEDIA_ROOT = tmp_dir
-    yield tmp_dir 
+    yield tmp_dir
+    # Cleanup: restore original MEDIA_ROOT and remove temp folder
+    settings.MEDIA_ROOT = original_media_root
+    shutil.rmtree(tmp_dir)
     
 @pytest.fixture
 def sample_products():
