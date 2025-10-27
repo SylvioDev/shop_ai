@@ -1,3 +1,4 @@
 secrets/
 secrets/.env
 db.sqlite3
+apps/cart/__pycache__/views.cpython-313.pyc
