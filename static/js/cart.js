@@ -135,7 +135,11 @@ function proceedToCheckout() {
         alert('Redirecting to checkout...');
         checkoutBtn.textContent = originalText;
         checkoutBtn.style.background = '';
+        checkoutAddress = location.protocol + "//" + location.host  + "/" + 'checkout';
+        window.location.href = checkoutAddress;
+
     }, 2000);
+    
 }
 
 // Continue shopping
