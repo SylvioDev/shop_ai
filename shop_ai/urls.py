@@ -25,8 +25,9 @@ urlpatterns = [
     path('products/', include('apps.products.urls')),
     path('cart/', include('apps.cart.urls')),
     path('accounts/', include('apps.users.urls')),
+    path('checkout/', include('apps.checkout.urls')),
     path('auth/', include('social_django.urls'), name='social')
-
+    
 ]
 
 if settings.DEBUG:
