@@ -71,7 +71,6 @@ def cart_detail(request : HttpRequest):
         
     """
     cart = Cart.from_request(request)
-    print(cart.get_cart_summary())
     return render(
         request, 
         'cart.html', 
