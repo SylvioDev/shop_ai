@@ -68,9 +68,9 @@ function addToCart(element){
             
     
             if (data.status == "success"){
-                document.getElementById('cart-items').innerHTML = data.count;
+                const el = document.querySelectorAll("#cart-items")[1];
+                el.innerHTML = data['count'];
                 
-    
             }
     
     
