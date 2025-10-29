@@ -1,13 +1,188 @@
-{% extends 'checkout_base.html'%}
-{% block title %} Checkout page {% endblock title %} 
-{% block content %} 
-<br>
-<br>
-<br>
-<br>
-<br>
-<h1> Welcome to checkout page<h1>
-<br>
-<br>
+{% extends "checkout_base.html" %}
+
+{% block content %}
+
+<div class="checkout-container">
+    <div class="page-header">
+        <h1><i class="bi bi-shield-lock"></i> Secure Checkout</h1>
+        <p>Complete your purchase securely</p>
+    </div>
+
+    <div class="checkout-content">
+        <!-- Formulaire de paiement -->
+        <div class="checkout-form">
+            <form id="checkoutForm">
+                <!-- Shipping Information -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="bi bi-truck"></i>
+                        Shipping Information
+                    </h3>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name *</label>
+                            <input type="text" class="form-control" id="firstName" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name *</label>
+                            <input type="text" class="form-control" id="lastName" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Email Address *</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" class="form-control" id="phone" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Street Address *</label>
+                            <input type="text" class="form-control" id="address" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">City *</label>
+                            <input type="text" class="form-control" id="city" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">State *</label>
+                            <input type="text" class="form-control" id="state" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">ZIP Code *</label>
+                            <input type="text" class="form-control" id="zip" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="bi bi-credit-card"></i>
+                        Payment Method
+                    </h3>
+                    
+                    <div class="payment-methods">
+                        <div class="payment-method active" data-method="card">
+                            <i class="bi bi-credit-card-2-front"></i>
+                            <span>Credit Card</span>
+                        </div>
+                        <div class="payment-method" data-method="paypal">
+                            <i class="bi bi-paypal"></i>
+                            <span>PayPal</span>
+                        </div>
+                        <div class="payment-method" data-method="bank">
+                            <i class="bi bi-bank"></i>
+                            <span>Bank Transfer</span>
+                        </div>
+                    </div>
+
+                    <div id="cardPaymentForm">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Card Number *</label>
+                                <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                <div class="card-icons">
+                                    <div class="card-icon visa">VISA</div>
+                                    <div class="card-icon mastercard">MC</div>
+                                    <div class="card-icon amex">AMEX</div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Cardholder Name *</label>
+                                <input type="text" class="form-control" id="cardName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Expiry Date *</label>
+                                <input type="text" class="form-control" id="expiry" placeholder="MM/YY" maxlength="5" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">CVV *</label>
+                                <input type="text" class="form-control" id="cvv" placeholder="123" maxlength="4" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-place-order">
+                    <i class="bi bi-lock-fill"></i> Place Order Securely
+                </button>
+            </form>
+        </div>
+
+        <!-- Order Summary (Cart) -->
+        <div class="cart-summary">
+            <h2 class="summary-title">Order Summary</h2>
+            
+            <div class="cart-items-list" id="cartItemsList">
+                <!-- Items du panier (dynamique depuis Django) -->
+                {% for key, product in cart.items %}
+                <div class="summary-item">
+                    <img src="{{ product.image }}" alt="{{ product.title }}" class="summary-item-img">
+                    <div class="summary-item-details">
+                        <div class="summary-item-title">{{ product.title }}</div>
+                        <div class="summary-item-qty">
+                            Qty: {{ product.quantity }}
+                            {% if product.attributes %}
+                                {% for key, attr in product.attributes.items %}
+                                    | {{ key }}: {{ attr }}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="summary-item-price">${{ product.price }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="summary-line">
+                <span>Subtotal ({{ cart_summary.total_items }} units)</span>
+                <span id="subtotal">${{ cart_summary.subtotal_price }}</span>
+            </div>
+            
+            <div class="summary-line">
+                <span>VAT (20%)</span>
+                <span id="vat">${{ cart_summary.taxes }}</span>
+            </div>
+            
+            <div class="summary-line">
+                <span>Shipping Fee</span>
+                <span id="shipping">${{ cart_summary.shipping_fee }}</span>
+            </div>
+            
+            <div class="summary-line total">
+                <span>Total</span>
+                <span id="total">${{ cart_summary.total_price }}</span>
+            </div>
+            <br>
+            <a href="{% url 'cart' %}">Modify cart</a>
+        </div>
+    </div>
+</div>
+
+<!-- Success/Error Modal -->
+<div class="modal-overlay" id="resultModal">
+    <div class="modal-content">
+        <div class="modal-icon success" id="modalIcon">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <h2 class="modal-title" id="modalTitle">Payment Successful!</h2>
+        <p class="modal-message" id="modalMessage">
+            Your order has been placed successfully. We'll send you a confirmation email shortly.
+        </p>
+        <div class="modal-order-number" id="orderNumber">
+            Order #ORD-2025-847392
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn modal-btn-primary" onclick="goToOrders()">
+                <i class="bi bi-box-seam"></i> View Orders
+            </button>
+            <button class="modal-btn modal-btn-secondary" onclick="continueShopping()">
+                <i class="bi bi-shop"></i> Continue Shopping
+            </button>
+        </div>
+    </div>
+</div>
+
 
 {% endblock content %}
+
