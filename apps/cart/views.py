@@ -66,7 +66,7 @@ def cart_detail(request : HttpRequest):
     Returns:
         JsonResponse (dict) : 
             - cart : cart attribute
-            - count : number of distinc items inside the cart
+            - count : number of distincts items inside the cart
             - cart_summary : cart'summary
         
     """
