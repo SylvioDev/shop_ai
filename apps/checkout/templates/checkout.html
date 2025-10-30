@@ -62,45 +62,14 @@
                     </h3>
                     
                     <div class="payment-methods">
-                        <div class="payment-method active" data-method="card">
-                            <i class="bi bi-credit-card-2-front"></i>
-                            <span>Credit Card</span>
-                        </div>
                         <div class="payment-method" data-method="paypal">
                             <i class="bi bi-paypal"></i>
                             <span>PayPal</span>
                         </div>
-                        <div class="payment-method" data-method="bank">
-                            <i class="bi bi-bank"></i>
-                            <span>Bank Transfer</span>
-                        </div>
+                        
                     </div>
 
-                    <div id="cardPaymentForm">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="form-label">Card Number *</label>
-                                <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
-                                <div class="card-icons">
-                                    <div class="card-icon visa">VISA</div>
-                                    <div class="card-icon mastercard">MC</div>
-                                    <div class="card-icon amex">AMEX</div>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Cardholder Name *</label>
-                                <input type="text" class="form-control" id="cardName" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Expiry Date *</label>
-                                <input type="text" class="form-control" id="expiry" placeholder="MM/YY" maxlength="5" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">CVV *</label>
-                                <input type="text" class="form-control" id="cvv" placeholder="123" maxlength="4" required>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
 
                 <button type="submit" class="btn-place-order">
@@ -121,12 +90,15 @@
                     <div class="summary-item-details">
                         <div class="summary-item-title">{{ product.title }}</div>
                         <div class="summary-item-qty">
-                            Qty: {{ product.quantity }}
                             {% if product.attributes %}
                                 {% for key, attr in product.attributes.items %}
-                                    | {{ key }}: {{ attr }}
+                                     {{ key }} : {{ attr }}
                                 {% endfor %}
+                                <br>
                             {% endif %}
+                            
+                            Quantity: <b>{{ product.quantity }}</b>
+                            
                         </div>
                     </div>
                     <div class="summary-item-price">${{ product.price }}</div>
@@ -154,7 +126,7 @@
                 <span id="total">${{ cart_summary.total_price }}</span>
             </div>
             <br>
-            <a href="{% url 'cart' %}">Modify cart</a>
+            <a class="text-dark text-decoration-none" href="{% url 'cart' %}"><i class="bi bi-arrow-left-square-fill"></i> Modify cart</a>
         </div>
     </div>
 </div>
