@@ -21,6 +21,7 @@ class Address(models.Model):
     street_address = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
+    country = models.CharField(max_length=100, default='Madagascar')
     zip_code = models.CharField(max_length=100)
     address_type = models.CharField(max_length=10, choices=ADDRESS_TYPE_CHOICES, default='home')
 
