@@ -185,7 +185,7 @@ class Cart:
             taxes (float) attribute 
 
         """
-        self.taxes = self.subtotal - (self.subtotal * 20) / 100
+        self.taxes = (self.subtotal * 20) / 100
         return self.taxes
     
     def set_total_items(self):
