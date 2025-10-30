@@ -396,10 +396,13 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         last_name = request.POST.get('last_name')
         profile_picture = request.FILES['profile-pic'] if request.FILES else None
         facebook_username = request.POST.get('facebook')
+        phone_number = request.POST.get('phone-number')
         user.username = username
-        user.userprofile.social_media_username = facebook_username
         user.first_name = first_name
         user.last_name = last_name
+        user.userprofile.social_media_username = facebook_username
+        user.userprofile_phone_number = phone_number
+
         if profile_picture:
             save_path = os.path.join(settings.MEDIA_ROOT, f'profile_pics\\user_{user.id}\\{profile_picture.name}')
             with open(save_path, 'wb') as output_file:
