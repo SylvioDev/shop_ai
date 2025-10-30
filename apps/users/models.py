@@ -13,8 +13,31 @@ class UserProfile(models.Model):
     profile_picture = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
     social_media_username = models.CharField(null=True, max_length=100)
     reset_token_used = models.BooleanField(default=False)
+    phone_number = models.CharField(null=False, default='000 000 00 000')
+
     def __str__(self):
         return f'{self.user.username} Profile' 
+
+class Address:
+    """
+    Rerpesents a physical address associated with a user.
+    """
+
+    ADDRESS_TYPE_CHOICES = [
+        ('billing', 'Billing'),
+        ('shipping', 'Shipping'),
+        ('home', 'Home')
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
+    street_address = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    zip_code = models.CharField(max_length=100)
+    address_type = models.CharField(max_length=10, choices=ADDRESS_TYPE_CHOICES, default='home')
+
+    def __str__(self):
+        return f"{self.user.username}' address "
 
 class PendingEmailChange(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
