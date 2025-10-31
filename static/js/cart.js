@@ -59,8 +59,10 @@ function removeItem(element) {
         
         if (data.status == "success"){
             
+            cart.remove();
             updateCartSummary(data.cart_summary);
-            cart.remove();    
+        
+                
         }
         
         })

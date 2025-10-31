@@ -6,11 +6,8 @@ class CheckoutService:
     
     def get_user_credentials(self, user_id : int):
         user = self.repository.retrieve_user(user_id)
-        return {
-            'username' : user.username,
-            'first_name' : user.first_name,
-            'last_name' : user.last_name,
-            'email' : user.email,
-            
-        }
-    
+        return user
+
+    def get_user_address(self, user_instance):
+        user_address = self.repository.retrieve_adress(user_instance)
+        return user_address
