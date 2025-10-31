@@ -401,10 +401,12 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         user.first_name = first_name
         user.last_name = last_name
         user.userprofile.social_media_username = facebook_username
-        user.userprofile_phone_number = phone_number
-
+        user.userprofile.phone_number = phone_number
         if profile_picture:
             user.userprofile.profile_picture.save(profile_picture.name, profile_picture)
             user.userprofile.save()
+        
         user.save()
+
+
         return redirect('profile')
