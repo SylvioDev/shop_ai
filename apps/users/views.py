@@ -404,10 +404,7 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         user.userprofile_phone_number = phone_number
 
         if profile_picture:
-            save_path = os.path.join(settings.MEDIA_ROOT, f'profile_pics\\user_{user.id}\\{profile_picture.name}')
-            with open(save_path, 'wb') as output_file:
-                for chunk in profile_picture.chunks():
-                    output_file.write(chunk)
-            user.userprofile.profile_picture = f'profile_pics/user_{user.id}/{profile_picture.name}'
+            user.userprofile.profile_picture.save(profile_picture.name, profile_picture)
+            user.userprofile.save()
         user.save()
         return redirect('profile')
