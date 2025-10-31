@@ -4,7 +4,7 @@ from django.db import models
 from django.conf import settings
 
 def user_directory_path(instance, filename):
-    return f'media/profile_pics/user_{instance.user.id}/{filename}'
+    return f'profile_pics/user_{instance.user.id}/{filename}'
 
 class Address(models.Model):
     """
