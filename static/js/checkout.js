@@ -89,12 +89,12 @@
 
     function goToOrders() {
         // Redirect to orders page (à adapter selon vos URLs Django)
-        window.location.href = "{% url 'profile' %}";
+        window.location.href = BuildUrl("accounts/profile");
     }
 
     function continueShopping() {
         // Redirect to products page
-        window.location.href = "{% url 'products' %}";
+        window.location.href = BuildUrl("products");
     }
 
     // Close modal when clicking outside
