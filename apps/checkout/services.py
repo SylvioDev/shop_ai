@@ -1,10 +1,4 @@
 from .repositories import CheckoutRepository
-from typing import (
-    AnyStr,
-    List,
-    Dict,
-    Bool
-)
 class CheckoutService:
     """
         Service for handling the checkout process in an e-commerce platform.
@@ -20,7 +14,7 @@ class CheckoutService:
             repo : (CheckoutRepository): Single source of truth for all checkout data.
 
         Methods:
-            check_promo_code(promo_code : str) : check promo code validity
+            
     """
     def __init__(self):
         """
@@ -28,12 +22,5 @@ class CheckoutService:
         """
         self.repo = CheckoutRepository()
     
-    def check_promo_code(self, promo_code : str) -> Dict:
-        """
-        Check promotion code validity
-
-        Returns:
-
-        """
-        code = self.repo.retrieve_code(promo_code)
-        print(code)
+    
+        
