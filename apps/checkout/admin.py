@@ -17,3 +17,7 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_display = ['order', 'product', 'product_name']
     list_filter = ['order', 'product']
     search_fields = ['product', 'order']
+
+@admin.register(PromoCode)
+class PromoCodeAdmin(admin.ModelAdmin):
+    list_display = ['code', 'discount_type', 'is_active', 'times_used', 'valid_from','valid_to']
