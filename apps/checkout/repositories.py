@@ -1,10 +1,9 @@
 from django.contrib.auth.models import User
 from apps.users.models import Address
-class UserRepository:
-    def retrieve_user(self, user_id) -> User:
-        return User.objects.filter(id=user_id)
+from .models import PromoCode
+class CheckoutRepository:
+    def retrieve_code(self, promo_code : str):
+        output = PromoCode.objects.get(code=promo_code)
+        return output
 
-    def retrieve_adress(self, user_instance : User):
-        user_address = Address.objects.get(user=user_instance)
-        return user_address
 

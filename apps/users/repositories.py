@@ -1,4 +1,7 @@
-from .models import User
+from .models import (
+    User,
+    Address
+)
 from django.db.models import Q
 from django.contrib.auth.models import User as UserAnnotation
 
@@ -45,6 +48,15 @@ class LoginRepository:
         if user and user.check_password(kwargs['password']):
             return user
         return None
+    
+class UserRepository:
+    def retrieve_user(self, user_id) -> User:
+        return User.objects.filter(id=user_id)
+
+    def retrieve_adress(self, user_instance : User):
+        user_address = Address.objects.get(user=user_instance)
+        return user_address
+
 
         
 

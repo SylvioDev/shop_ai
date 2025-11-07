@@ -1,6 +1,7 @@
 from .repositories import (
     SignupRepository,
     LoginRepository,
+    UserRepository
 )
 from django.contrib.auth import get_backends
 from django.core.mail import send_mail
@@ -132,7 +133,18 @@ class LoginService:
                 return {'error':'Account disabled, please activate it first'}
         else:
             return {'error' : 'Invalid username or password'}
-            
+
+class UserService:
+    def __init__(self):
+        self.repository = UserRepository()
+    
+    def get_user_credentials(self, user_id : int):
+        user = self.repository.retrieve_user(user_id)
+        return user
+
+    def get_user_address(self, user_instance):
+        user_address = self.repository.retrieve_adress(user_instance)
+        return user_address
 
 
     
