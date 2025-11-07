@@ -1,13 +1,39 @@
-from .repositories import UserRepository
-
+from .repositories import CheckoutRepository
+from typing import (
+    AnyStr,
+    List,
+    Dict,
+    Bool
+)
 class CheckoutService:
-    def __init__(self):
-        self.repository = UserRepository()
-    
-    def get_user_credentials(self, user_id : int):
-        user = self.repository.retrieve_user(user_id)
-        return user
+    """
+        Service for handling the checkout process in an e-commerce platform.
 
-    def get_user_address(self, user_instance):
-        user_address = self.repository.retrieve_adress(user_instance)
-        return user_address
+        This class orchestrates the complete checkout flow including:
+            - Validating cart contents
+            - Applying promotions and discounts
+            - Processing payment
+            - Creating orders
+            - Sending confirmation emails
+
+        Attributes:
+            repo : (CheckoutRepository): Single source of truth for all checkout data.
+
+        Methods:
+            check_promo_code(promo_code : str) : check promo code validity
+    """
+    def __init__(self):
+        """
+        Initialize service with repository dependency.
+        """
+        self.repo = CheckoutRepository()
+    
+    def check_promo_code(self, promo_code : str) -> Dict:
+        """
+        Check promotion code validity
+
+        Returns:
+
+        """
+        code = self.repo.retrieve_code(promo_code)
+        print(code)

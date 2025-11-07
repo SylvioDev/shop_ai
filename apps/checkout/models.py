@@ -60,4 +60,28 @@ class OrderItem(models.Model):
     quantity = models.IntegerField(default=1)
     total_price = models.DecimalField(decimal_places=2, max_digits=10)
 
-    
+class Payment(models.Model):
+
+    PAYMENT_METHODS = [
+        ('paypal', 'Paypal')
+    ]
+
+    PAYMENT_STATUS = [
+        ('pending', 'Pending'),
+        ('success', 'Success'),
+        ('failed', 'Failed')
+    ]
+
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
+    method = models.CharField(choices=PAYMENT_METHODS)
+    status = models.CharField(choices=PAYMENT_STATUS)
+    transaction_id = models.CharField(max_length=255, default='67N9717781765035V')
+    amount = models.DecimalField(decimal_places=2, max_digits=10, default=0.00)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Shipping(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    address_line = models.CharField(max_length=255)
+    zip_code = models.CharField(max_length=255)
+    country = models.CharField(max_length=255)
+    status = models.CharField(max_length=255)
