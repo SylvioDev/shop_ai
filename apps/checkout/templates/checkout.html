@@ -20,36 +20,36 @@
                     </h3>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">First Name *</label>
-                            <input type="text" class="form-control" id="firstName" value = "{{ user.first_name }}" required>
+                            <label class="form-label">First Name </label>
+                            <input type="text" class="form-control" id="firstName" value = "{{ user.first_name }}" disabled>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Last Name *</label>
-                            <input type="text" class="form-control" id="lastName" value = "{{ user.last_name }}"required>
+                            <label class="form-label">Last Name </label>
+                            <input type="text" class="form-control" id="lastName" value = "{{ user.last_name }}"disabled>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Email Address *</label>
-                            <input type="email" class="form-control" id="email" value = "{{ user.email }}" required>
+                            <label class="form-label">Email Address </label>
+                            <input type="email" class="form-control" id="email" value = "{{ user.email }}" disabled>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Phone Number *</label>
-                            <input type="tel" class="form-control" id="phone" value = "{{ user.userprofile.phone_number }}" required>
+                            <label class="form-label">Phone Number </label>
+                            <input type="tel" class="form-control" id="phone" value = "{{ user.userprofile.phone_number }}" disabled>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Street Address *</label>
-                            <input type="text" class="form-control" id="address" value = "{{ user_address.street_address }}" required>
+                            <label class="form-label">Street Address </label>
+                            <input type="text" class="form-control" id="address" value = "{{ user_address.street_address }}" disabled>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">City *</label>
-                            <input type="text" class="form-control" id="city" value="{{ user_address.city }}" required>
+                            <label class="form-label">City </label>
+                            <input type="text" class="form-control" id="city" value="{{ user_address.city }}" disabled>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">State *</label>
-                            <input type="text" class="form-control" id="state" value="{{ user_address.state }}" required>
+                            <label class="form-label">State </label>
+                            <input type="text" class="form-control" id="state" value="{{ user_address.state }}" disabled>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">ZIP Code *</label>
-                            <input type="text" class="form-control" id="zip" value="{{ user_address.zip_code }}" required>
+                            <label class="form-label">ZIP Code </label>
+                            <input type="text" class="form-control" id="zip" value="{{ user_address.zip_code }}" disabled>
                         </div>
                     </div>
                 </div>
