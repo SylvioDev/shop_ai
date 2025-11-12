@@ -40,7 +40,7 @@ const csrftoken = getCookie('csrftoken');
                 
                 // defining request variable
                 const request = new Request(
-                    `promo-code/verify/${code}`,
+                    `promo-code/verify/`,
                     {
                         method: 'POST',
                         headers: {
@@ -48,7 +48,7 @@ const csrftoken = getCookie('csrftoken');
                             'Content-Type': 'application/json' 
                         },
                         mode: 'same-origin', 
-                        body: JSON.stringify({ 'code' : code})
+                        body: JSON.stringify({ 'promo_code' : code})
                     }
                 );
                 
