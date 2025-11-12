@@ -2,10 +2,13 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from apps.cart.cart import Cart
 from apps.users.services import UserService
+from .promo.promo_service import PromoService
 from django.http import JsonResponse
-from .promo_service import PromoService
-from .promo_service import InvalidPromoCodeError
-
+from .promo.custom_exceptions import (
+    PromoCodeNotFoundError,
+    PromoCodeExpiredError,
+    PromoCodeInactiveError
+)
 
 @login_required
 def home(request):
@@ -23,22 +26,23 @@ def home(request):
         }
     )
 
-def check_code_promo(request, promo_code):
+def check_code_promo(request, promo_code : str):
     """
     View that handle promo code validation request
 
     """
     try:
-        code = PromoService().check_promo_code(promo_code)
-    except InvalidPromoCodeError as error:
+        validated_promo = PromoService().check_promo(promo_code)
+        message = f"Promo code \"{validated_promo.get('promo').code}\" applied!"
         return JsonResponse({
-            'status' : 'error',
-            'message' : str(error)
-        }, status=400)
-    
-    return JsonResponse(
-        {
             'status' : 'success',
-            'message' : code
-        }
-    )
+            'promo' : validated_promo.get('promo').code,
+            'message' : message
+        })
+    
+    except (PromoCodeNotFoundError, PromoCodeExpiredError, PromoCodeInactiveError) as error:
+        return JsonResponse({'status':'error', 'error' : str(error)})    
+
+    
+
+    

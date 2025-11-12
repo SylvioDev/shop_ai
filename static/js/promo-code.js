@@ -1,14 +1,17 @@
 const promoInput = document.getElementById('promoCode');
-        const applyBtn = document.getElementById('applyBtn');
-        const messageDiv = document.getElementById('message');
+const applyBtn = document.getElementById('applyBtn');
+const messageDiv = document.getElementById('message');
+const csrftoken = getCookie('csrftoken');
 
         // Valid promo codes (you can modify these)
+        /*
         const validPromoCodes = {
             'SAVE10': { discount: 10, message: '10% discount applied successfully!' },
             'SAVE20': { discount: 20, message: '20% discount applied successfully!' },
             'WELCOME': { discount: 15, message: 'Welcome discount of 15% applied!' },
             'FREESHIP': { discount: 0, message: 'Free shipping applied!' }
         };
+        */
 
         function showMessage(text, type) {
             messageDiv.textContent = text;
@@ -34,15 +37,42 @@ const promoInput = document.getElementById('promoCode');
 
             // Simulate API call
             setTimeout(() => {
-                if (validPromoCodes[code]) {
-                    showMessage(`✓ ${validPromoCodes[code].message}`, 'success');
-                    promoInput.value = '';
-                } else {
-                    showMessage('✗ Invalid promo code. Please try again.', 'error');
-                }
+                
+                // defining request variable
+                const request = new Request(
+                    `promo-code/verify/${code}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrftoken,
+                            'Content-Type': 'application/json' 
+                        },
+                        mode: 'same-origin', 
+                        body: JSON.stringify({ 'code' : code})
+                    }
+                );
+                
+                fetch(request)
+                    .then(response => response.json())
+                    .then(data => {
+                        
+                        if (data['status'] == 'success'){
+                            showMessage(`✓ ${data['message']}`, 'success');
+                            promoInput.value = '';      
+                        }
+                        else {
+                            showMessage(`✗ ${data['error']}`, 'error');   
+                        }
+
+                    })
+                    .catch(error => {
+                        console.log('Error : ', error);
+                    });
+
                 
                 applyBtn.disabled = false;
                 applyBtn.textContent = 'Apply';
+                
             }, 1000);
         }
 
