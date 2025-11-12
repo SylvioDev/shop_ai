@@ -6,5 +6,5 @@ from .views import (
 
 urlpatterns = [
     path('', home, name='home'),
-    path('promo-code/verify/<promo_code>', check_code_promo, name='check_promo')
+    path('promo-code/verify/', check_code_promo, name='check_promo')
 ]

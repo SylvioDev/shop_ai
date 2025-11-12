@@ -9,6 +9,7 @@ from .promo.custom_exceptions import (
     PromoCodeExpiredError,
     PromoCodeInactiveError
 )
+import json
 
 @login_required
 def home(request):
@@ -26,11 +27,12 @@ def home(request):
         }
     )
 
-def check_code_promo(request, promo_code : str):
+def check_code_promo(request):
     """
     View that handle promo code validation request
 
     """
+    promo_code = json.loads(request.body).get('promo_code')
     try:
         validated_promo = PromoService().check_promo(promo_code)
         message = f"Promo code \"{validated_promo.get('promo').code}\" applied!"
@@ -42,7 +44,5 @@ def check_code_promo(request, promo_code : str):
     
     except (PromoCodeNotFoundError, PromoCodeExpiredError, PromoCodeInactiveError) as error:
         return JsonResponse({'status':'error', 'error' : str(error)})    
-
     
-
     
