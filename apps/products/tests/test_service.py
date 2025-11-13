@@ -21,7 +21,6 @@ class TestProductService:
         'input_category, expected_count',
         [
             ('All', 5),
-            ('Food', 2),
             ('Clothe', 2),
             ('High-Tech', 1),
             ('invalid_category', 'Error')

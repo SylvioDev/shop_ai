@@ -1,6 +1,5 @@
 from django.contrib import admin
 from .models import (
-    PromoCode,
     Order,
     OrderItem
 )
@@ -18,6 +17,3 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_filter = ['order', 'product']
     search_fields = ['product', 'order']
 
-@admin.register(PromoCode)
-class PromoCodeAdmin(admin.ModelAdmin):
-    list_display = ['code', 'discount_type', 'is_active', 'times_used', 'valid_from','valid_to']
