@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %} Payment initiation {% endblock title %}
+
+{% block content %}
+
+<div class="checkout-container" style="margin-top: 120px;">
+
+    <!-- Page header -->
+    <div class="page-header">
+        <h1>Preparing Your Payment</h1>
+        <p>Your cart is validated. Please wait while we redirect you securely…</p>
+    </div>
+
+    <div class="checkout-content">
+
+        <!-- Left card : Payment preparation message -->
+        <div class="checkout-form" style="text-align:center; padding-top: 40px; padding-bottom: 40px;">
+
+            <div class="section-title" style="justify-content:center;">
+                <i class="bi bi-shield-check"></i>
+                Payment Details
+            </div>
+
+            <p class="mb-4" style="font-size:1.05rem; color:#4a5568;">
+                You selected: <strong>{{ payment_method|default:"PayPal" }}</strong>
+            </p>
+
+            <p class="mb-4" style="font-size:1.2rem; font-weight:600;">
+                Total to charge: 
+                <span style="color:#667eea;">${{ total }}</span>
+            </p>
+
+            <!-- Spinner -->
+            <div style="margin-top: 35px; margin-bottom: 20px;">
+                <div class="spinner"></div>
+            </div>
+
+            <p style="color:#718096;">Redirecting you to the payment page…</p>
+
+            <!-- Fallback link -->
+            <p class="mt-3">
+                If you are not redirected,
+                <a href="{{ redirect_url }}" class="text-primary">click here</a>.
+            </p>
+        </div>
+
+        <!-- Right card : Short summary only -->
+        <div class="cart-summary">
+            <h3 class="summary-title">Order Summary</h3>
+
+            <div class="summary-line">
+                <span>Subtotal</span>
+                <span>${{ subtotal }}</span>
+            </div>
+
+            <div class="summary-line">
+                <span>VAT ({{ vat_rate }}%)</span>
+                <span>${{ vat_total }}</span>
+            </div>
+
+            <div class="summary-line">
+                <span>Shipping</span>
+                <span>${{ shipping_fee }}</span>
+            </div>
+
+            <div class="summary-line total">
+                <span>Total</span>
+                <span>${{ total }}</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Auto redirect after page loads
+    window.onload = function() {
+        const url = "{{ redirect_url }}";
+        if (url) {
+            setTimeout(() => {
+                window.location.href = url;
+            }, 1500);
+        }
+    };
+</script>
+
+{% endblock content %}

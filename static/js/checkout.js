@@ -1,3 +1,5 @@
+const csrftoken = getCookie('csrftoken');
+    
     // Payment method selection
     document.querySelectorAll('.payment-method').forEach(method => {
         method.addEventListener('click', function() {
@@ -36,7 +38,7 @@
         
         // Show loading state
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span> Processing Payment...';
+        btn.innerHTML = '<span class="spinner"></span> Checking your cart...';
         
         // Simulate payment processing
         setTimeout(() => {
@@ -44,17 +46,58 @@
             btn.innerHTML = originalText;
             
             // Simulate random success/failure (90% success rate)
-            const isSuccess = Math.random() > 0.1;
+            //const isSuccess = Math.random() > 0.1;
             
+            const request = new Request(
+        
+                `/checkout/review/`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrftoken,
+                            'Content-Type': 'application/json' 
+                        },
+                        mode: 'same-origin', 
+                        body: JSON.stringify("data")
+                    }
+            );
+
+            fetch(request)
+                .then(response => response.json())
+                .then(data => {
+
+                    if (data["status"] == "success"){
+                        showSuccessModal("Redirecting to paypal ...");
+                        setTimeout(() => {
+                            window.location = "https://www.paypal.com";
+                        }, 2000);
+                        
+
+                    }
+                    else {
+                        showErrorModal(data["error"]);
+                    }
+
+                })
+                .catch(error => {
+
+                })
+
+            
+            /*
             if (isSuccess) {
                 showSuccessModal();
             } else {
                 showErrorModal();
             }
+            */
+
+
         }, 2500);
     });
 
-    function showSuccessModal() {
+
+    function showSuccessModal(msg) {
         const modal = document.getElementById('resultModal');
         const icon = document.getElementById('modalIcon');
         const title = document.getElementById('modalTitle');
@@ -63,15 +106,15 @@
         
         icon.className = 'modal-icon success';
         icon.innerHTML = '<i class="bi bi-check-circle-fill"></i>';
-        title.textContent = 'Payment Successful!';
-        message.textContent = "Your order has been placed successfully. We'll send you a confirmation email shortly.";
+        title.textContent = 'Cart validation successful';
+        message.textContent = msg;//"Your order has been placed successfully. We'll send you a confirmation email shortly.";
         orderNum.textContent = `Order #ORD-${new Date().getFullYear()}-${Math.floor(Math.random() * 900000 + 100000)}`;
         orderNum.style.display = 'block';
         
         modal.classList.add('show');
     }
 
-    function showErrorModal() {
+    function showErrorModal(msg) {
         const modal = document.getElementById('resultModal');
         const icon = document.getElementById('modalIcon');
         const title = document.getElementById('modalTitle');
@@ -80,8 +123,8 @@
         
         icon.className = 'modal-icon error';
         icon.innerHTML = '<i class="bi bi-x-circle-fill"></i>';
-        title.textContent = 'Payment Failed';
-        message.textContent = 'There was an issue processing your payment. Please check your payment details and try again.';
+        title.textContent = 'Cart validation failed';
+        message.textContent = msg;
         orderNum.style.display = 'none';
         
         modal.classList.add('show');

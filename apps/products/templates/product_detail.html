@@ -182,7 +182,11 @@
                         <!-- Stock Status -->
                         <div id="product-stock" class="stock-status in-stock">
                             <i class="fas fa-check-circle"></i>
-                            <span id="stock">In Stock - {{ product.stock }} available</span>
+                            {% if product.stock > 0 %}
+                                <span id="stock">In Stock - {{ product.stock }} available</span>
+                            {% else %}
+                                <span id="stock" style="color:#f44336">Out of stock </span>
+                            {% endif %}
                         </div>
 
                         <br>
@@ -234,12 +238,16 @@
 
                         <!-- Action Buttons -->
                         <div class="d-flex gap-1 mb-2">
-                            <button onclick="addToCart(this)" class="btn btn-primary btn-lg flex-fill">
+                            {% if product.stock > 0 %}
+                            <button id="add-to-cart" onclick="addToCart(this)" class="btn btn-primary btn-lg flex-fill">
                                 Add to Cart <i class="bi bi-cart me-2"></i>
                             </button>
+                            {% endif %}
+                            <!--
                             <button class="btn btn-outline-secondary">
                                 <i class="bi bi-heart"></i>
                             </button>
+                            -->
                         </div>
                     
                         

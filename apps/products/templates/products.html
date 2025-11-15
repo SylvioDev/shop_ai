@@ -148,7 +148,12 @@
         <div class="p-3">
           <small class="text-muted">{{ product.category }}</small>
           <h6 class="mt-1 mb-1">{{ product.name }}</h6>
-          <p class="mb-1 text-muted" style="font-size: 0.9rem;">In Stock : {{ product.stock }}</p>
+          {% if product.stock > 0 %}
+              <p class="mb-1 text-muted" style="font-size: 0.9rem;">In Stock : {{ product.stock }}</p>
+          {% else %}
+              <p class="mb-1 text-muted" style="font-size: 0.9rem;color : red">Out of stock</p>
+          
+          {% endif %}
           <div class="d-flex align-items-center justify-content-between">
             <span class="price">${{ product.price }} </span>
             {% if product.old_price > 0 %}
@@ -165,6 +170,7 @@
           </button>
           
         </div>
+        
       </div>
       {% endfor %}
       
