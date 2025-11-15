@@ -78,7 +78,17 @@ if (productVariantSelect){
                     product_images.src = data['image'];
                     product_title.innerHTML = data['title'];
                     product_price.innerHTML = `$${data['price']}`;
-                    product_stock.innerHTML = `In Stock - ${data['stock']} available`;    
+                    product_stock.innerHTML = `In Stock - ${data['stock']} available`;   
+                    if (data['stock'] == 0){
+                        product_stock.innerHTML = 'Out of stock';
+                        product_stock.style.color = '#f44336';
+                        document.getElementById("add-to-cart").style.display = "none";
+                    }
+                    else {
+                        product_stock.style.color = 'green';
+                        document.getElementById("add-to-cart").style.display = 'block';
+                    }
+                    //
                     document.getElementById("product-quantity").value = 1;
                     liste.innerHTML = '';
                     let attributes = Object.entries(data.attributes);

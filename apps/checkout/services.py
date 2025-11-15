@@ -1,4 +1,6 @@
 from .repositories import CheckoutRepository
+from ..cart.cart import Cart
+from .cart_validation.cart_chain import CartValidationChain
 class CheckoutService:
     """
         Service for handling the checkout process in an e-commerce platform.
@@ -21,6 +23,12 @@ class CheckoutService:
         Initialize service with repository dependency.
         """
         self.repo = CheckoutRepository()
+        self.validation_chain = CartValidationChain()
     
-    
-        
+    def cart_validation(self, cart : Cart):
+        """
+        Responsible for cart validation rules.
+
+        """ 
+        validated_cart = self.validation_chain.validate(cart)
+        return validated_cart

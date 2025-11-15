@@ -5,7 +5,7 @@
 <div class="checkout-container">
     <div class="page-header">
         <h1><i class="bi bi-shield-lock"></i> Secure Checkout</h1>
-        <p>Complete your purchase securely</p>
+        <p>Review your credentials before payment</p>
     </div>
 
     <div class="checkout-content">
@@ -73,7 +73,7 @@
                 </div>
 
                 <button type="submit" class="btn-place-order">
-                    <i class="bi bi-lock-fill"></i> Place Order Securely
+                    <i class="bi bi-lock-fill"></i> Proceed to payment
                 </button>
             </form>
         </div>
@@ -123,7 +123,7 @@
             
             <div class="summary-line total">
                 <span>Total</span>
-                <span id="total">${{ cart_summary.total_price }}</span>
+                <span id="total">${{ cart_summary.total_price|floatformat:2 }}</span>
             </div>
             <br>
             <a class="text-dark text-decoration-none" href="{% url 'cart' %}"><i class="bi bi-arrow-left-square-fill"></i> Modify cart</a>
@@ -144,6 +144,8 @@
         <div class="modal-order-number" id="orderNumber">
             Order #ORD-2025-847392
         </div>
+        
+        <!--
         <div class="modal-buttons">
             <button class="modal-btn modal-btn-primary" onclick="goToOrders()">
                 <i class="bi bi-box-seam"></i> View Orders
@@ -152,6 +154,8 @@
                 <i class="bi bi-shop"></i> Continue Shopping
             </button>
         </div>
+        -->
+
     </div>
 </div>
 
