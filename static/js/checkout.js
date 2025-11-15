@@ -33,67 +33,72 @@ const csrftoken = getCookie('csrftoken');
     document.getElementById('checkoutForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const btn = e.target.querySelector('.btn-place-order');
-        const originalText = btn.innerHTML;
-        
-        // Show loading state
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span> Checking your cart...';
-        
-        // Simulate payment processing
-        setTimeout(() => {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
+        // Verify payment method selection
+
+        const paymentMethod = document.getElementById("payment-meth");
+        let paymentMethodClass = paymentMethod.getAttribute("class");
+        if (paymentMethodClass != "payment-method active"){
+            showErrorModal("No payment method selected. Please select one to continue ");
+        }
+        else {
+            const btn = e.target.querySelector('.btn-place-order');
+            const originalText = btn.innerHTML;
             
-            // Simulate random success/failure (90% success rate)
-            //const isSuccess = Math.random() > 0.1;
+            // Show loading state
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Checking your cart...';
             
-            const request = new Request(
+            // Simulate payment processing
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                
+                // Simulate random success/failure (90% success rate)
+                //const isSuccess = Math.random() > 0.1;
+                
+                const request = new Request(
+            
+                    `/checkout/review/`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': csrftoken,
+                                'Content-Type': 'application/json' 
+                            },
+                            mode: 'same-origin', 
+                            body: JSON.stringify("data")
+                        }
+                );
+    
+                fetch(request)
+                    .then(response => response.json())
+                    .then(data => {
+    
+                        if (data["status"] == "success"){
+                            showSuccessModal("Redirecting to payment page ...");
+                            setTimeout(() => {
+                                window.location = BuildUrl('checkout/payment');
+                            }, 2000);
+                            
+    
+                        }
+                        else {
+                            showErrorModal(data["error"]);
+                        }
+    
+                    })
+                    .catch(error => {
+    
+                    })
+    
+                
+                
+    
+            }, 2500);
+        }
+
+
         
-                `/checkout/review/`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': csrftoken,
-                            'Content-Type': 'application/json' 
-                        },
-                        mode: 'same-origin', 
-                        body: JSON.stringify("data")
-                    }
-            );
-
-            fetch(request)
-                .then(response => response.json())
-                .then(data => {
-
-                    if (data["status"] == "success"){
-                        showSuccessModal("Redirecting to paypal ...");
-                        setTimeout(() => {
-                            window.location = "https://www.paypal.com";
-                        }, 2000);
-                        
-
-                    }
-                    else {
-                        showErrorModal(data["error"]);
-                    }
-
-                })
-                .catch(error => {
-
-                })
-
-            
-            /*
-            if (isSuccess) {
-                showSuccessModal();
-            } else {
-                showErrorModal();
-            }
-            */
-
-
-        }, 2500);
     });
 
 

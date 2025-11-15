@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'checkout_base.html' %}
 
 {% block title %} Payment initiation {% endblock title %}
 
@@ -51,22 +51,22 @@
 
             <div class="summary-line">
                 <span>Subtotal</span>
-                <span>${{ subtotal }}</span>
+                <span>${{ subtotal |floatformat:2 }}</span>
             </div>
 
             <div class="summary-line">
                 <span>VAT ({{ vat_rate }}%)</span>
-                <span>${{ vat_total }}</span>
+                <span>${{ vat_total |floatformat:2 }}</span>
             </div>
 
             <div class="summary-line">
                 <span>Shipping</span>
-                <span>${{ shipping_fee }}</span>
+                <span>${{ shipping_fee |floatformat:2 }}</span>
             </div>
 
             <div class="summary-line total">
                 <span>Total</span>
-                <span>${{ total }}</span>
+                <span>${{ total |floatformat:2 }}</span>
             </div>
         </div>
 
