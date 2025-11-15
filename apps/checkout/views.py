@@ -51,8 +51,20 @@ def review_cart(request):
 class PaymentInitView(DetailView):
     template_name = 'payment.html'
     def get(self, request):
+        cart = Cart.from_request(request)
+        cart_summary = cart.get_cart_summary()
+        context = {
+            'count' : len(cart.cart),
+            'subtotal' : cart_summary.get('subtotal_price'),
+            'vat_rate' : 20,
+            'vat_total' : cart_summary['taxes'],
+            'shipping_fee' : cart_summary['shipping_fee'],
+            'total' : cart_summary.get('total_price'),
+            
+        }
         return render(
             request,
-            self.template_name
+            self.template_name,
+            context=context
         )
         
