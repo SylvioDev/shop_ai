@@ -1,5 +1,5 @@
 secrets/
-shop_ai/.env
+.env
 db.sqlite3
 apps/cart/__pycache__/views.cpython-313.pyc
 apps/checkout__pycache__/
