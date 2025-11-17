@@ -596,8 +596,8 @@
                 
                 <div class="summary-line">
                     
-                    <span id="subtotal-items">Subtotal ({{ cart_summary.total_items }}) units </span>
-                    <span id="subtotal-price">${{ cart_summary.subtotal_price }}</span>
+                    <span id="subtotal-items">Subtotal ({{ cart_summary.total_items}}) units </span>
+                    <span id="subtotal-price">${{ cart_summary.subtotal_price|floatformat:2 }}</span>
                 </div>
             
                 <div class="cart-actions">
