@@ -92,7 +92,8 @@
                         <div class="summary-item-qty">
                             {% if product.attributes %}
                                 {% for key, attr in product.attributes.items %}
-                                     {{ key }} : {{ attr }}
+                                     {{ key }} : {{ attr }} 
+                                     <br>
                                 {% endfor %}
                                 <br>
                             {% endif %}
@@ -108,17 +109,17 @@
 
             <div class="summary-line">
                 <span>Subtotal ({{ cart_summary.total_items }} units)</span>
-                <span id="subtotal">${{ cart_summary.subtotal_price }}</span>
+                <span id="subtotal">${{ cart_summary.subtotal_price|floatformat:2 }}</span>
             </div>
             
             <div class="summary-line">
                 <span>VAT (20%)</span>
-                <span id="vat">${{ cart_summary.taxes }}</span>
+                <span id="vat">${{ cart_summary.taxes|floatformat:2 }}</span>
             </div>
             
             <div class="summary-line">
                 <span>Shipping Fee</span>
-                <span id="shipping">${{ cart_summary.shipping_fee }}</span>
+                <span id="shipping">${{ cart_summary.shipping_fee|floatformat:2 }}</span>
             </div>
             
             <div class="summary-line total">

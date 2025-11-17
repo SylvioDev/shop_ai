@@ -22,10 +22,10 @@ function updateCartSummary(data){
     document.getElementById("cart-items").innerHTML = data['count'];
     cartItems.innerHTML = `Shopping Cart : ${data['count']} items`;
     subtotalItems.innerHTML = `Subtotal (${data['total_items']}) units `;
-    subtotalPrice.innerHTML = `$${data['subtotal_price']}`;
-    taxes.innerHTML = `$${data['taxes']}`;
-    shippingFee.innerHTML = `$${data['shipping_fee']}`;
-    totalPrice.innerHTML = `$${data['total_price']}`;
+    subtotalPrice.innerHTML = `$${data['subtotal_price'].toFixed(2)}`;
+    taxes.innerHTML = `$${data['taxes'].toFixed(2)}`;
+    shippingFee.innerHTML = `$${data['shipping_fee'].toFixed(2)}`;
+    totalPrice.innerHTML = `$${data['total_price'].toFixed(2)}`;
         
 }
 
