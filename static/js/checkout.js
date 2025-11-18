@@ -75,7 +75,7 @@ const csrftoken = getCookie('csrftoken');
                     .then(data => {
     
                         if (data["status"] == "success"){
-                            showSuccessModal("Redirecting to payment page ...");
+                            showSuccessModal("Redirecting to Stripe payment page ...");
                             setTimeout(() => {
                                 window.location = BuildUrl('checkout/payment');
                             }, 2000);
