@@ -24,21 +24,25 @@ class OutOfStockHandler(BaseHandler):
     def handle(self, cart : Cart):
         # Check for stock availability
         invalid_products = []
-        for item in cart.cart.values():
-            product_quantity = item.get('quantity')
-            product_sku = str(item.get('sku')).strip()
+        for key, value in cart.cart.items():
+            product_quantity = value.get('quantity')
+            product_sku = value.get('sku')
             product_dict = ProductRepository().get_by_sku(product_sku)
             product = product_dict.get('product')
-            data = {
-                'product_name' : item.get('title'),
-                'stock_quantity' : product.stock
-            }
+            
             if int(product_quantity) > product.stock:
-                invalid_products.append(data)
-                message = 'There was an issue with your payment.'
-                for product in invalid_products:
-                    message += f"\n Not enough stock for \"{product.get('product_name')}\" . Only {product.get('stock_quantity')} left."
+                invalid_products.append(
+                    {
+                        'product_name' : value.get('title'),
+                        'stock_quantity' : product.stock
+                    }
+                )
         
-                raise OutOfStockError(message)
-            else:
-                return super().handle(cart)
+        if invalid_products:
+            message = 'There was an issue with your payment.'
+            for product in invalid_products:
+                message += f"\n Not enough stock for \"{product.get('product_name')}\" . Only {product.get('stock_quantity')} left."
+            raise OutOfStockError(message)
+        
+        return super().handle(cart)
+            
