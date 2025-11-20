@@ -1,449 +1,97 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Status</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="{% static 'css/base-style.css' %}" rel="stylesheet" />
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "checkout_base.html" %}
+{% block title %} Payment status {% endblock title%}
+{% block content %} 
+    <br>
+    <br>
+    <br>
+    <br>
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding-top: 80px;
-            padding-bottom: 40px;
-        }
-
-        .profile-pic {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            cursor: pointer;
-            border: 2px solid #667eea;
-        }
-
-        .custom-dropdown {
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border: none;
-            padding: 8px 0;
-        }
-
-        .custom-dropdown .dropdown-item {
-            padding: 10px 20px;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
-        }
-
-        .custom-dropdown .dropdown-item:hover {
-            background: #f7fafc;
-            padding-left: 25px;
-        }
-
-        .icon-wrapper {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border-radius: 8px;
-            text-align: center;
-            line-height: 30px;
-            margin-right: 10px;
-        }
-
-        .payment-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .status-card {
-            background: white;
-            border-radius: 16px;
-            padding: 35px 30px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            max-width: 100%;
-            text-align: center;
-            animation: slideUp 0.5s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .icon-container {
-            width: 90px;
-            height: 90px;
-            margin: 0 auto 25px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: scaleIn 0.5s ease-out 0.2s both;
-        }
-
-        @keyframes scaleIn {
-            from {
-                opacity: 0;
-                transform: scale(0);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .success-icon {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-size: 45px;
-        }
-
-        .failed-icon {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            font-size: 45px;
-        }
-
-        .checkmark {
-            animation: checkmark 0.5s ease-out 0.4s both;
-        }
-
-        @keyframes checkmark {
-            0% {
-                transform: scale(0) rotate(-45deg);
-            }
-            50% {
-                transform: scale(1.2) rotate(-45deg);
-            }
-            100% {
-                transform: scale(1) rotate(0deg);
-            }
-        }
-
-        .cross {
-            animation: cross 0.5s ease-out 0.4s both;
-        }
-
-        @keyframes cross {
-            0% {
-                transform: scale(0) rotate(-90deg);
-            }
-            50% {
-                transform: scale(1.2) rotate(-90deg);
-            }
-            100% {
-                transform: scale(1) rotate(0deg);
-            }
-        }
-
-        .status-title {
-            font-size: 1.75rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            animation: fadeIn 0.5s ease-out 0.6s both;
-        }
-
-        .status-message {
-            color: #6c757d;
-            font-size: 0.95rem;
-            margin-bottom: 25px;
-            line-height: 1.5;
-            animation: fadeIn 0.5s ease-out 0.7s both;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .transaction-details {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 18px;
-            margin-bottom: 25px;
-            text-align: left;
-            animation: fadeIn 0.5s ease-out 0.8s both;
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-
-        .detail-label {
-            color: #6c757d;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        .detail-value {
-            color: #212529;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .btn-custom {
-            padding: 10px 30px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            transition: all 0.3s ease;
-            animation: fadeIn 0.5s ease-out 0.9s both;
-            border: none;
-        }
-
-        .btn-success-custom {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: white;
-        }
-
-        .btn-success-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-danger-custom {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            border: none;
-            color: white;
-        }
-
-        .btn-danger-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(245, 87, 108, 0.4);
-        }
-
-        .btn-outline-custom {
-            border: 2px solid #667eea;
-            color: #667eea;
-            background: transparent;
-            margin-left: 10px;
-        }
-
-        .btn-outline-custom:hover {
-            background: #667eea;
-            color: white;
-        }
-
-        .success-text {
-            color: #28a745;
-        }
-
-        .failed-text {
-            color: #dc3545;
-        }
-
-        @media (max-width: 768px) {
-            .payment-container {
-                padding: 15px;
-            }
-
-            .status-card {
-                padding: 25px 20px;
-            }
-
-            .status-title {
-                font-size: 1.5rem;
-            }
-
-            .status-message {
-                font-size: 0.9rem;
-            }
-
-            .btn-custom {
-                padding: 10px 20px;
-                font-size: 0.85rem;
-                margin: 5px;
-            }
-
-            .btn-outline-custom {
-                margin-left: 0;
-                margin-top: 10px;
-            }
-
-            .icon-container {
-                width: 75px;
-                height: 75px;
-            }
-
-            .success-icon, .failed-icon {
-                font-size: 35px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white px-3 py-2 shadow-sm fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'products' %}">
-                <small style="font-weight: 600; color: Black">SHOP AI</small>
-            </a>
-            
-           
-      
-            <div class="ms-auto d-flex align-items-center" id="cart-container">
-                {% if not user.is_authenticated %}
-                    <a href="{% url 'login' %}" class="me-3 text-dark text-decoration-none">
-                        <i class="bi bi-box-arrow-right"></i> Log in
-                    </a>
-                {% endif %}
-          
-                <a href="{% url 'cart' %}" class="position-relative me-3">
-                    <i class="bi bi-cart fs-5 text-dark"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
-                        {{ count }}
-                    </span>
-                </a>
-                
-                {% if user.is_authenticated %}
-                    <div class="dropdown">
-                        {% if user.userprofile.profile_picture %}
-                            <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile" class="profile-pic" data-bs-toggle="dropdown" aria-expanded="false" />
-                        {% else %}
-                            <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.PKlD9uuBX0m4S8cViqXZHAHaHa%3Fr%3D0%26pid%3DApi&f=1&ipt=d21b0bf7247a83a119e6d7e81a158c7613ca0d57822822d896676e1e229758ba&ipo=images" alt="Profile" class="profile-pic" data-bs-toggle="dropdown" aria-expanded="false" />
-                        {% endif %}
-          
-                        <ul class="dropdown-menu dropdown-menu-end custom-dropdown">
-                            <li>
-                                <a class="dropdown-item" href="#">Hi {{user.username}}</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'profile' %}">
-                                    <span class="icon-wrapper bg-warning text-white">
-                                        <i class="bi bi-person-fill"></i>
-                                    </span>
-                                    Profile
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider" /></li>
-                            <li>
-                                <a class="dropdown-item text-danger" href="{% url 'logout' %}">
-                                    <span class="icon-wrapper bg-danger text-white">
-                                        <i class="bi bi-power"></i>
-                                    </span>
-                                    Log out
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </nav>
-
-    <!-- Payment Status Content -->
+<!-- Payment Status Content -->
     <div class="payment-container col-lg-6 ">
-    <!-- Success Status -->
-    <div id="successStatus" class="status-card" style="display: none;">
-        <div class="icon-container success-icon">
-            <i class="bi bi-check-lg checkmark"></i>
-        </div>
-        <h1 class="status-title success-text">Payment Successful!</h1>
-        <p class="status-message">Your payment has been processed successfully. A confirmation email has been sent to your registered email address.</p>
+    
+        {% if status == 'success' %}
+            <!-- Success Status -->
+            <div id="successStatus" class="status-card">
+                <div class="icon-container success-icon">
+                    <i class="bi bi-check-lg checkmark"></i>
+                </div>
+
+                <h1 class="status-title success-text">Payment Successful!</h1>
+                <p class="status-message">Your payment has been processed successfully. A confirmation email has been sent to your registered email address.</p>
+                
+                <div class="transaction-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Transaction ID:</span>
+                        <span class="detail-value" id="transactionId">{{ payment_details.transaction_id }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Amount Paid:</span>
+                        <span class="detail-value" id="amount">${{ payment_details.amount_paid |floatformat:2 }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Payment Method:</span>
+                        <span class="detail-value" id="paymentMethod">{{ payment_details.payment_method }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Date & Time:</span>
+                        <span class="detail-value" id="dateTime">{{ payment_details.date }}</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-custom btn-success-custom" onclick="downloadReceipt()">
+                    <i class="bi bi-download me-2"></i>Download Receipt
+                </button>
+                <button class="btn btn-custom btn-outline-custom" onclick="goToHome()">
+                    <i class="bi bi-house me-2"></i>Go to Home
+                </button>
+            </div>
+
+        {% elif status == 'error' %} 
         
-        <div class="transaction-details">
-            <div class="detail-row">
-                <span class="detail-label">Transaction ID:</span>
-                <span class="detail-value" id="transactionId">TXN123456789</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Amount Paid:</span>
-                <span class="detail-value" id="amount">$299.99</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Payment Method:</span>
-                <span class="detail-value" id="paymentMethod">Visa ****1234</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Date & Time:</span>
-                <span class="detail-value" id="dateTime">Nov 13, 2025 10:30 AM</span>
-            </div>
-        </div>
+            <!-- Failed Status -->
+            <div id="failedStatus" class="status-card">
+                <div class="icon-container failed-icon">
+                    <i class="bi bi-x-lg cross"></i>
+                </div>
+                <h1 class="status-title failed-text">Payment Failed!</h1>
+                <p class="status-message">Unfortunately, your payment could not be processed. Please check your payment details and try again.</p>
+                
+                <div class="transaction-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Reference ID:</span>
+                        <span class="detail-value" id="failedRefId">{{ transaction_id }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Reason:</span>
+                        <span class="detail-value" id="failedReason">{{ failure_reason }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Attempted Amount:</span>
+                        <span class="detail-value" id="failedAmount">${{ amount_paid }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Date & Time:</span>
+                        <span class="detail-value" id="failedDateTime">{{ payment_date }}</span>
+                    </div>
+                </div>
 
-        <button class="btn btn-custom btn-success-custom" onclick="downloadReceipt()">
-            <i class="bi bi-download me-2"></i>Download Receipt
-        </button>
-        <button class="btn btn-custom btn-outline-custom" onclick="goToHome()">
-            <i class="bi bi-house me-2"></i>Go to Home
-        </button>
-    </div>
+                <button class="btn btn-custom btn-danger-custom" onclick="retryPayment()">
+                    <i class="bi bi-arrow-clockwise me-2"></i><a class="text-white text-decoration-none" href="{% url 'home' %}">Retry Payment</a>
+                </button>
+                <button class="btn btn-custom btn-outline-custom" onclick="contactSupport()">
+                    <i class="bi bi-headset me-2"></i>Contact Support
+                </button>
+            </div>
 
-    <!-- Failed Status -->
-    <div id="failedStatus" class="status-card" style="display: none;">
-        <div class="icon-container failed-icon">
-            <i class="bi bi-x-lg cross"></i>
-        </div>
-        <h1 class="status-title failed-text">Payment Failed!</h1>
-        <p class="status-message">Unfortunately, your payment could not be processed. Please check your payment details and try again.</p>
         
-        <div class="transaction-details">
-            <div class="detail-row">
-                <span class="detail-label">Reference ID:</span>
-                <span class="detail-value" id="failedRefId">REF987654321</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Reason:</span>
-                <span class="detail-value" id="failedReason">Insufficient Funds</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Attempted Amount:</span>
-                <span class="detail-value" id="failedAmount">$299.99</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Date & Time:</span>
-                <span class="detail-value" id="failedDateTime">Nov 13, 2025 10:30 AM</span>
-            </div>
-        </div>
+        {% else %}
+            
+        {% endif %}
 
-        <button class="btn btn-custom btn-danger-custom" onclick="retryPayment()">
-            <i class="bi bi-arrow-clockwise me-2"></i><a class="text-white text-decoration-none" href="{% url 'home' %}">Retry Payment</a>
-        </button>
-        <button class="btn btn-custom btn-outline-custom" onclick="contactSupport()">
-            <i class="bi bi-headset me-2"></i>Contact Support
-        </button>
-    </div>
-    </div>
-
-    <!-- Toggle Buttons for Demo -->
-    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
-        <button class="btn btn-success btn-sm me-2" onclick="showStatus('success')">Show Success</button>
-        <button class="btn btn-danger btn-sm" onclick="showStatus('failed')">Show Failed</button>
+    
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'js/cart.js' %}"></script>
-    <script src="{% static 'js/csrf.js' %}"></script>
     <script>
         // Show status based on URL parameter or manual selection
         function showStatus(status) {
@@ -463,13 +111,10 @@
         window.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const status = urlParams.get('status');
-            
-            if (status === 'success' || status === 'failed') {
-                showStatus(status);
-            } else {
-                // Default to success for demo
-                showStatus('success');
-            }
+                
+            showStatus('success');
+    
+
         });
 
         // Button actions
@@ -480,7 +125,7 @@
 
         function goToHome() {
             alert('Redirecting to home page...');
-            // window.location.href = '/home';
+            window.location.href = '/products';
         }
 
         function retryPayment() {
@@ -493,5 +138,5 @@
             // window.location.href = '/support';
         }
     </script>
-</body>
-</html>
+
+{% endblock content%}

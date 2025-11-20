@@ -141,9 +141,10 @@ class UserService:
     def get_user_credentials(self, user_id : int):
         user = self.repository.retrieve_user(user_id)
         return user
-
-    def get_user_address(self, user_instance):
-        user_address = self.repository.retrieve_adress(user_instance)
+    
+    @staticmethod
+    def get_user_address(user_instance):
+        user_address = UserService().repository.retrieve_adress(user_instance)
         return user_address
 
 

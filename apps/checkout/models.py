@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from apps.products.models import Product
+from apps.users.models import Address
 import uuid
+from datetime import datetime
 class Order(models.Model):
 
     STATUS_CHOICES = [
@@ -9,7 +11,9 @@ class Order(models.Model):
         ('paid', 'Paid'),
         ('shipped', 'Shipped'),
         ('completed', 'Completed'),
-        ('cancelled', 'Cancelled')
+        ('cancelled', 'Cancelled'),
+        ('refunded_insufficient_stock', 'RefundedInsufficientStock'),
+        
     ]
 
     order_number = models.CharField(max_length=255, unique=True, editable=False, default='ORD-2025')
@@ -18,11 +22,15 @@ class Order(models.Model):
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    discount_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    vat = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    shipping_address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, related_name='shipping_address')   
     final_total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def save(self, force_insert = False , *args, **kwargs):
-        self.order_number = f'ORD-{self.created_at.year}-{uuid.uuid1().hex[:8].upper()}'
+        year = datetime.now().year
+        self.order_number = f'ORD-{year}-{uuid.uuid1().hex[:8].upper()}'
         super().save(force_insert=force_insert, *args, **kwargs)
 
     def __str__(self):
@@ -43,7 +51,10 @@ class OrderItem(models.Model):
 class Payment(models.Model):
 
     PAYMENT_METHODS = [
-        ('paypal', 'Paypal')
+        ('paypal', 'Paypal'),
+        ('stripe', 'Stripe'),
+        ('credit_card', 'Credit Card'),
+        ('cash_on_delivery', 'Cash on Delivery')
     ]
 
     PAYMENT_STATUS = [
@@ -57,6 +68,7 @@ class Payment(models.Model):
     status = models.CharField(choices=PAYMENT_STATUS)
     transaction_id = models.CharField(max_length=255, default='67N9717781765035V')
     amount = models.DecimalField(decimal_places=2, max_digits=10, default=0.00)
+    currency = models.CharField(max_length=10, default='USD')
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Shipping(models.Model):

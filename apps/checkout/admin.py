@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import (
     Order,
-    OrderItem
+    OrderItem,
+    Payment
 )
 # Register your models here.
 
@@ -17,3 +18,9 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_filter = ['order', 'product']
     search_fields = ['product', 'order']
 
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ['order', 'method', 'status', 'amount']
+    list_filter = ['method', 'status']
+    search_fields = ['order', 'method']
+    

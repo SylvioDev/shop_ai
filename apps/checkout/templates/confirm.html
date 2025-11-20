@@ -3,18 +3,16 @@
 {% block title %} Payment initiation {% endblock title %}
 
 {% block content %}
-
-
-
-<br>
 <br>
 
-<div class="checkout-container" style="margin-top: 120px;">
+<div class="checkout-container" style="margin-top: 10px;">
 
     <!-- Page header -->
     <div class="page-header">
-        <h1>Preparing Your Payment</h1>
-        <p>Your cart is validated. Please wait while we redirect you securely…</p>
+        <h1><i class="bi bi-shield-lock"></i> Secure Payment</h1>
+        {% if count > 0 %}
+            <p>Your cart is validated. Please click the button to pay ...</p>
+        {% endif %}
     </div>
 
     <div class="checkout-content">
@@ -37,17 +35,36 @@
             </p>
 
             <!-- Spinner -->
-            <div style="margin-top: 35px; margin-bottom: 20px;">
+            <div style="margin-top: 5px; margin-bottom: 5px;">
                 <div class="spinner"></div>
             </div>
+            
+            {% if count == 0 %}
+                <p> Your cart is empty. Please add items to your cart before proceeding to payment.</p>
+                <br>
 
-            <p style="color:#718096;">Redirecting you to the payment page…</p>
+                <form method="post" id="payment-form">
+                    {% csrf_token %}
+                    <button id="stripe-button" class="btn btn-warning" disabled>
+                        <i class="text-white bi bi-credit-card"></i>
+                        <label id="stripe-button-label" class="text-white">Confirm & Pay</label>
+                    </button>
+                </form>
 
-            <!-- Fallback link -->
-            <p class="mt-3">
-                If you are not redirected,
-                <a href="{{ redirect_url }}" class="text-primary">click here</a>.
-            </p>
+            {% else %}
+                <p style="font-size:1.05rem; color:#4a5568;">
+                    Redirecting you to Stripe payment gateway. Please wait ...
+                <form method="post" id="payment-form">
+                    {% csrf_token %}
+                    <button id="stripe-button" class="btn btn-warning">
+                        <i class="text-white bi bi-credit-card"></i>
+                        <label id="stripe-button-label" class="text-white">Confirm & Pay</label>
+                    </button>
+                </form>
+
+                
+            {% endif %}
+
         </div>
 
         <!-- Right card : Short summary only -->
@@ -73,6 +90,8 @@
                 <span>Total</span>
                 <span>${{ total |floatformat:2 }}</span>
             </div>
+
+            
         </div>
 
     </div>
@@ -80,14 +99,19 @@
 
 <script>
     // Auto redirect after page loads
-    window.onload = function() {
-        const url = "{{ redirect_url }}";
-        if (url) {
-            setTimeout(() => {
-                window.location.href = url;
-            }, 1500);
-        }
-    };
+    
+    stripeButton = document.getElementById('stripe-button');
+    stripeButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        stripeButton.disabled = true;
+        stripeButton.innerHTML = '<span class="spinner"></span> <label class="text-white">Redirecting to Stripe.com ...<label>';
+        setTimeout(() => {
+            document.getElementById('payment-form').submit();
+        }, 1000);            
+    });
+
+
+
 </script>
 
 {% endblock content %}
