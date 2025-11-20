@@ -3,16 +3,18 @@ from .views import (
     home,
     review_cart,
     payment_status,
-    create_checkout_session,
     stripe_webhook,
     success,
-    cancel
+    cancel,
+    PaymentConfirmView,
+    payment_processing
 )
 
 urlpatterns = [
     path('', home, name='home'),
     path('review/', review_cart, name='review'),
-    path('payment/', create_checkout_session, name='create_checkout_session'),
+    path('confirm/', PaymentConfirmView.as_view(), name='confirm'),
+    path('payment/', payment_processing, name='create-checkout-session'),
     path('payment_status/', payment_status, name='payment-status'),
     path('webhook/stripe/', stripe_webhook, name='stripe_webhook'),
     path('success/', success, name='success'),

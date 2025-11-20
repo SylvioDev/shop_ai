@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'apps.checkout',
     'crispy_forms',
     'crispy_bootstrap5',
-    'social_django'
+    'social_django',
 ]
 
 MIDDLEWARE = [
