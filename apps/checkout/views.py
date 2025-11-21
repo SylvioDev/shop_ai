@@ -1,15 +1,17 @@
-from django.shortcuts import render
-from django.shortcuts import redirect
-from django.urls import reverse
+from django.shortcuts import (
+    redirect,
+    render
+)
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponse
 from django.views.generic.detail import DetailView
-from django.http import HttpResponse
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+import stripe
 from apps.cart.cart import Cart
-
 from apps.users.services import UserService
-from apps.checkout.checkout_services import CheckoutService
+from apps.checkout.services import CheckoutService
 from apps.checkout.payment_service import StripePaymentService
 from .cart_validation.cart_exceptions import (
     EmptyCartError,
@@ -17,13 +19,14 @@ from .cart_validation.cart_exceptions import (
 )
 from .custom_exceptions import (
     InvalidPayloadException,
-    InvalidSignatureException
+    InvalidSignatureException,
 )
 from .models import (
-    Order,
-    Payment
+    Payment,
+    Order
 )
-from apps.users.services import UserService
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 @login_required
 def home(request):
@@ -44,45 +47,28 @@ def home(request):
         }
     )
 
-def payment_status(request):
-    """ 
-    Display payment status to the user based on the session_id 
-    and status provided in the GET parameters.
-    """
-    cart = Cart.from_request(request)
-    session_id = request.GET.get('session_id', '')
-    status = request.GET.get('status', 'pending')
-    payment_details = StripePaymentService().payment_details(session_id)
-   
-    if session_id == '' or status == 'pending' or payment_details == 'invalid session id':
-        return HttpResponseBadRequest('Error encountered while retrieving payment details.')
-    
-    return render(
-        request, 
-        'payment_status.html', 
-        {
-            'count' : len(cart),
-            'status' : status,
-            'payment_details' : payment_details
-        }
-    )
-
 def review_cart(request):
     cart = Cart.from_request(request)
     try:
         cart_validation = CheckoutService().cart_validation(cart)
         return JsonResponse({
             'status':'success',
-            'message' : 'ok lesy eee',
+            'message' : 'cart is valid',
         })
     except (EmptyCartError, OutOfStockError) as error:
         return JsonResponse({'status':'error', 'error': str(error)})
 
 @login_required
 def payment_processing(request):
+    """
+    Handle payment processing by creating a Stripe checkout session.
+    """
     cart = Cart.from_request(request)
     try:
-        checkout_session = StripePaymentService().create_session(cart, request.user)
+        # Order and payment initialization
+        order = CheckoutService().order_creation(cart, request.user)
+        payment = CheckoutService().payment_creation(order=order, payment_method='stripe')
+        checkout_session = StripePaymentService().create_session(cart, request.user, order, payment)
     except ValueError as error:
         return JsonResponse({'status':'error', 'error': str(error)})
     
@@ -91,6 +77,7 @@ def payment_processing(request):
     
     return redirect(checkout_session.url, code=303)
     
+@csrf_exempt
 @require_POST
 def stripe_webhook(request):
     payload = request.body
@@ -102,13 +89,35 @@ def stripe_webhook(request):
         return HttpResponse(status=400)
     return HttpResponse(status=200)
 
-def success(request):
-    session_id = request.GET.get('session_id', '')
-    return redirect(f'/checkout/payment_status/?session_id={session_id}&status=success')
+def success(request, order_id):
+    return redirect(f'/checkout/payment_status/{order_id}')
 
-def cancel(request):
-    session_id = request.GET.get('session_id', '')
-    return redirect(f'/checkout/payment_status/?session_id={session_id}&status=error')
+def cancel(request, order_id : str):
+    return redirect(f'/checkout/payment_status/{order_id}')
+
+@login_required
+def payment_status(request, order_id : str):
+    """ 
+    Handle payment status 
+    """
+    user = request.user
+    cart = Cart.from_request(request)
+    order = Order.objects.get(order_number=order_id)
+    payment = Payment.objects.get(order=order)
+    if order.status == 'paid':
+        if len(cart) > 0:
+            cart.clear() # Clear user cart
+        
+    return render(
+        request, 
+        'payment_status.html', 
+        {   
+            'order_status' : order.status,
+            'count' : len(cart) if cart else 0,
+            'payment' : payment,
+            'order' : order
+        }
+    )
 
 class PaymentConfirmView(DetailView):
     """
@@ -142,31 +151,4 @@ class PaymentConfirmView(DetailView):
         """
         Handle POST requests for payment confirmation.
         """
-        cart = Cart.from_request(request)
-        total_price = cart.get_cart_summary().get('total_price')
-        subtotal = cart.get_cart_summary().get('subtotal_price')
-        user = request.user
-        # Order creation before redirecting to payment gateway
-        order = Order.objects.create(
-            customer_id=user,
-            status='pending',
-            total_price=subtotal,
-            final_total=total_price,
-            vat = cart.get_cart_summary().get('taxes'),
-            shipping_cost = cart.get_cart_summary().get('shipping_fee'),
-            shipping_address = UserService.get_user_address(user_instance=user.id)
-        )
-        
-        # Payment creation 
-        
-        payment = Payment.objects.create(
-            order=order,
-            method='stripe',
-            status='pending',
-            amount=total_price
-        )
-        
-        order.save()
-        payment.save()
-        
         return redirect('create-checkout-session')

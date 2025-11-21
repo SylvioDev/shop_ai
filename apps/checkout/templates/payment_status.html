@@ -9,7 +9,7 @@
 <!-- Payment Status Content -->
     <div class="payment-container col-lg-6 ">
     
-        {% if status == 'success' %}
+        {% if order_status == 'paid' %}
             <!-- Success Status -->
             <div id="successStatus" class="status-card">
                 <div class="icon-container success-icon">
@@ -22,19 +22,19 @@
                 <div class="transaction-details">
                     <div class="detail-row">
                         <span class="detail-label">Transaction ID:</span>
-                        <span class="detail-value" id="transactionId">{{ payment_details.transaction_id }}</span>
+                        <span class="detail-value" id="transactionId">{{ payment.transaction_id }}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Amount Paid:</span>
-                        <span class="detail-value" id="amount">${{ payment_details.amount_paid |floatformat:2 }}</span>
+                        <span class="detail-value" id="amount">${{ payment.amount|floatformat:2 }}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Payment Method:</span>
-                        <span class="detail-value" id="paymentMethod">{{ payment_details.payment_method }}</span>
+                        <span class="detail-value" id="paymentMethod">{{ payment.method }}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Date & Time:</span>
-                        <span class="detail-value" id="dateTime">{{ payment_details.date }}</span>
+                        <span class="detail-value" id="dateTime">{{ payment.paied_at }}</span>
                     </div>
                 </div>
 

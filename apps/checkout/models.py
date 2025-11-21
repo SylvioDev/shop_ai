@@ -16,7 +16,7 @@ class Order(models.Model):
         
     ]
 
-    order_number = models.CharField(max_length=255, unique=True, editable=False, default='ORD-2025')
+    order_number = models.CharField(max_length=255, unique=True, editable=False)
     customer_id = models.ForeignKey(User, on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -27,10 +27,12 @@ class Order(models.Model):
     shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     shipping_address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, related_name='shipping_address')   
     final_total = models.DecimalField(max_digits=10, decimal_places=2)
-
+    cart = models.JSONField(default=dict)
+    
     def save(self, force_insert = False , *args, **kwargs):
         year = datetime.now().year
-        self.order_number = f'ORD-{year}-{uuid.uuid1().hex[:8].upper()}'
+        if not self.order_number:
+            self.order_number = f'ORD-{year}-{uuid.uuid1().hex[:8].upper()}'
         super().save(force_insert=force_insert, *args, **kwargs)
 
     def __str__(self):
@@ -62,15 +64,17 @@ class Payment(models.Model):
         ('success', 'Success'),
         ('failed', 'Failed')
     ]
-
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
     method = models.CharField(choices=PAYMENT_METHODS)
     status = models.CharField(choices=PAYMENT_STATUS)
-    transaction_id = models.CharField(max_length=255, default='67N9717781765035V')
+    stripe_payment_intent_id = models.TextField(default='67N9717781765035V', null=True)
+    stripe_session_id = models.TextField(default='1234')
+    transaction_id = models.CharField(max_length=255, default='SDQSA')
     amount = models.DecimalField(decimal_places=2, max_digits=10, default=0.00)
     currency = models.CharField(max_length=10, default='USD')
     created_at = models.DateTimeField(auto_now_add=True)
-
+    paied_at = models.DateTimeField(null=True, blank=True)
+    
 class Shipping(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     address_line = models.CharField(max_length=255)
