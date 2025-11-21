@@ -2,4 +2,6 @@ secrets/
 .env
 db.sqlite3
 apps/cart/__pycache__/views.cpython-313.pyc
-apps/checkout__pycache__/
+apps/checkout/__pycache__/
+apps/products/__pycache__/
+apps/users/__pycache__/
