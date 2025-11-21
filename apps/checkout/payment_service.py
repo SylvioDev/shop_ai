@@ -4,12 +4,16 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 import stripe
-from .utils import format_timestamp
 from .custom_exceptions import (
     InvalidPayloadException,
     InvalidSignatureException
 )
 import logging
+from .models import (
+    Order,
+    Payment
+)
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +92,7 @@ class StripePaymentService:
     
         return line_items    
         
-    def create_session(self, cart : Cart, user : User):
+    def create_session(self, cart : Cart, user : User, order : Order, payment : Payment):
         """
         Create a Stripe checkout session for the given cart.
 
@@ -110,48 +114,44 @@ class StripePaymentService:
                 payment_method_types=['card'],
                 line_items=line_items,
                 mode='payment',
-                success_url=settings.DOMAIN_URL + 'checkout/success/?session_id={CHECKOUT_SESSION_ID}',
-                cancel_url=settings.DOMAIN_URL + 'checkout/cancel/?session_id={CHECKOUT_SESSION_ID}',
+                success_url=settings.DOMAIN_URL + f'checkout/success/{order.order_number}',
+                cancel_url=settings.DOMAIN_URL + f'checkout/cancel/{order.order_number}',
                 metadata={
-                        'user_id' : user.id
+                        'user_id' : user.id,
+                        'order_id' : order.order_number,
+                        'payment_id' : payment.id,
                     }
                 )
             return checkout_session
         except Exception as error:
             return JsonResponse({'error': str(error)})
     
-    def payment_details(self, session_id : str):
+    def payment_details(self, payment : Payment):
         """
-        Retrieve payment details from Stripe using the session ID.
-
+        Retrieve payment details from database
         Args:
-            session_id (str): The Stripe checkout session ID.
+            payment (str): The Stripe checkout session ID.
             
         Returns:
             dict: A dictionary containing payment details.
             
         """
-        try:
-            session = stripe.checkout.Session.retrieve(session_id)
-
-            transaction_id = session.payment_intent
-            amount_paid = session.amount_total / 100  # Convert cents to dollars
-            date = format_timestamp(session.created)
-            payment_method = session.payment_method_types[0]
-            status = session.payment_status        
-            details = {
-                'transaction_id' : transaction_id,
-                'amount_paid' : amount_paid,
-                'date' : date,
-                'payment_method' : payment_method,
-                'status' : status
-            }
-        except stripe.InvalidRequestError as error:
-            details = {'error' : str(error)}
-            return 'invalid session id'
+        
+        transaction_id = payment.transaction_id
+        amount_paid = payment.amount / 100  # Convert cents to dollars
+        date = payment.paied_at
+        payment_method = payment.method
+        status = payment.status        
+        details = {
+            'transaction_id' : transaction_id,
+            'amount_paid' : amount_paid,
+            'date' : date,
+            'payment_method' : payment_method,
+            'status' : status
+        }
         
         return details
-
+    
     @classmethod
     def handle_webhook(cls, payload, sig_header):
         """
@@ -182,11 +182,25 @@ class StripePaymentService:
         # 2 Handle event types as needed
         
         if event.type == 'checkout.session.completed':
-            cls.handle_checkout_session_completed(event.data.object)
+            # For successful payment
+            # Retrieve session variable
+            session = event['data']['object']
+            order_number = session.get('metadata')['order_id']
+            user_id = session.get('metadata')['user_id']
+            # local import to avoid circular import with services.py
+            from .services import CheckoutService
+            CheckoutService().handle_success_payment_status(
+                session=session,
+                order_id=order_number,
+                user_id=int(user_id)
+            )
+            
         elif event.type == 'payment_intent.succeeded':
-            cls.handle_payment_intent_succeeded(event.data.object)
+            pass
+            #cls.handle_payment_intent_succeeded(event.data.object)
         elif event.type == 'payment_intent.payment_failed':
-            cls.handle_payment_intent_failed(event.data.object)
+            pass
+            #cls.handle_payment_intent_failed(event.data.object)
         else:
             logger.info(f"Unhandled event type {event.type}")
         
