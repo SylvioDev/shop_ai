@@ -3,5 +3,9 @@ secrets/
 db.sqlite3
 apps/cart/__pycache__/views.cpython-313.pyc
 apps/checkout/__pycache__/
+apps/checkout/migrations/__pycache__/
 apps/products/__pycache__/
+apps/products/migrations/__pycache__/
 apps/users/__pycache__/
+apps/users/migrations/__pycache__
+apps/checkout/__pycache__/views.cpython-313.pyc
