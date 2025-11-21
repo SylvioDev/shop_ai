@@ -104,6 +104,7 @@ def payment_status(request, order_id : str):
     cart = Cart.from_request(request)
     order = Order.objects.get(order_number=order_id)
     payment = Payment.objects.get(order=order)
+    
     if order.status == 'paid':
         if len(cart) > 0:
             cart.clear() # Clear user cart
