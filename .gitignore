@@ -9,3 +9,12 @@ apps/products/migrations/__pycache__/
 apps/users/__pycache__/
 apps/users/migrations/__pycache__
 apps/checkout/__pycache__/views.cpython-313.pyc
+apps/__pycache__/conftest.cpython-313-pytest-9.0.1.pyc
+# test directories
+apps/checkout/tests/
+apps/users/tests/
+apps/products/tests/
+apps/cart/tests/
+apps/__pycache__
+shop_ai/__pycache__
+
