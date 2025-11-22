@@ -40,7 +40,6 @@ class StripePaymentService:
         """
         self.repo = CheckoutRepository()
         
-    
     def create_cart_checkout(self, cart : Cart):
         """
         Responsible for creating Stripe checkout session for the cart.
