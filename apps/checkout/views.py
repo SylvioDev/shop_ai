@@ -1,3 +1,4 @@
+from apps.users.models import User
 from django.shortcuts import (
     redirect,
     render
@@ -23,6 +24,7 @@ from .custom_exceptions import (
 )
 from .models import (
     Payment,
+    OrderItem,
     Order
 )
 
@@ -69,6 +71,7 @@ def payment_processing(request):
         order = CheckoutService().order_creation(cart, request.user)
         payment = CheckoutService().payment_creation(order=order, payment_method='stripe')
         checkout_session = StripePaymentService().create_session(cart, request.user, order, payment)
+        CheckoutService().add_order_items(order, cart=cart.cart)
     except ValueError as error:
         return JsonResponse({'status':'error', 'error': str(error)})
     
@@ -106,8 +109,7 @@ def payment_status(request, order_id : str):
     payment = Payment.objects.get(order=order)
     
     if order.status == 'paid':
-        if len(cart) > 0:
-            cart.clear() # Clear user cart
+        cart.clear() # Clear user cart
         
     return render(
         request, 
@@ -153,3 +155,26 @@ class PaymentConfirmView(DetailView):
         Handle POST requests for payment confirmation.
         """
         return redirect('create-checkout-session')
+    
+#### Receipt view ####
+
+def process_receipt(request, order_id : str):
+    order = Order.objects.get(order_number=order_id)
+    user = User.objects.get(id=order.customer_id.id)
+    full_name = user.first_name + ' ' + user.last_name
+    shipping_address = UserService().get_user_address(user)
+    order_items = OrderItem.objects.filter(order=order)
+    context = {
+        'order_id' : order_id,
+        'order' : order,
+        'user' : user,
+        'full_name' : full_name,
+        'shipping_address' : shipping_address.street_address,
+        'order_items':order_items
+    }
+    
+    return render(
+        request,
+        'receipt.html',
+        context=context
+    )

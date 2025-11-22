@@ -68,11 +68,9 @@ class CheckoutService:
             user: The user placing the order.
         """
         total_price = cart.get_cart_summary().get('total_price')
-        subtotal = cart.get_cart_summary().get('subtotal_price')
         order = self.repo.create_order(user, cart.get_cart_summary(), total_price)
         order.cart = cart.cart
         order.save()
-        
         return order
     
     def payment_creation(self, order : Order, payment_method : str):
@@ -83,9 +81,30 @@ class CheckoutService:
             payment_method (str): The method of payment.            
 
         """
-        amount = order.total_price
+        amount = order.final_total
         payment = self.repo.create_payment(order, payment_method, amount)
         return payment
+    
+    def add_order_items(self, order : Order, cart : dict):
+        """
+        Attach order items to a particular order
+        """
+        for sku, item in cart.items():
+            product_dict = ProductRepository().get_by_sku(item.get('sku'))
+            product = product_dict['product']
+            total_price = item.get('quantity') * item.get('price')
+            order_item = CheckoutRepository().add_order_item(
+                order=order,
+                product=product,
+                product_type=product_dict['product_type'],
+                product_name=item.get('title'),
+                product_attributes=item.get('attributes', {}),
+                unit_price=item.get('price'),
+                quantity=item.get('quantity'),
+                total_price=total_price,
+                img_src=item.get('image')    
+            )
+        return order_item
     
     def handle_success_payment_status(self, session, order_id : str, user_id : User):
         """
@@ -114,6 +133,7 @@ class CheckoutService:
         cart = order.cart
         for sku, product in cart.items():
             CheckoutRepository().decrease_stock(product_sku=sku, quantity=product.get('quantity'))
-        
+            
         return order
-        
+         
+    

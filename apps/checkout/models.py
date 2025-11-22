@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
-from apps.products.models import Product
+from apps.products.models import (
+    Product,
+    ProductVariant
+)
 from apps.users.models import Address
 import uuid
 from datetime import datetime
@@ -19,7 +22,7 @@ class Order(models.Model):
     order_number = models.CharField(max_length=255, unique=True, editable=False)
     customer_id = models.ForeignKey(User, on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -40,16 +43,15 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
-    price = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
-    total_price = models.DecimalField(decimal_places=2, max_digits=10, default=0.00)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,null=True)
+    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE,null=True)
     product_name = models.CharField(max_length=255)
     attributes = models.JSONField(verbose_name='product_attributes')
     unit_price = models.DecimalField(decimal_places=2, max_digits=10)
     quantity = models.IntegerField(default=1)
     total_price = models.DecimalField(decimal_places=2, max_digits=10)
-
+    image_url = models.CharField(max_length=500, null=True)
+    
 class Payment(models.Model):
 
     PAYMENT_METHODS = [
