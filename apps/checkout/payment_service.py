@@ -194,7 +194,6 @@ class StripePaymentService:
                 order_id=order_number,
                 user_id=int(user_id)
             )
-            
         elif event.type == 'payment_intent.succeeded':
             pass
             #cls.handle_payment_intent_succeeded(event.data.object)

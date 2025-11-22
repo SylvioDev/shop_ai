@@ -1,14 +1,20 @@
 from .models import (
     Order,
+    OrderItem,
     Payment
+)
+from apps.products.models import (
+    Product,
+    ProductVariant
 )
 from .custom_exceptions import OrderNotFoundError
 from apps.users.services import UserService
 from apps.users.models import User
 from apps.cart.cart import Cart
 from apps.products.repositories import ProductRepository 
+from typing import Union
 class CheckoutRepository:
-    def create_order(self, user : User, cart_data : Cart, total_amount : float) -> Order:
+    def create_order(self, user : User, cart_data : dict, total_amount : float) -> Order:
         """
         Create a new order in the repository.
 
@@ -23,7 +29,7 @@ class CheckoutRepository:
         order = Order.objects.create(
             customer_id=user,
             status='pending',
-            total_price=total_amount,
+            subtotal=cart_data.get('subtotal_price'),
             final_total=total_amount,
             vat=cart_data.get('taxes', 0),
             shipping_cost=cart_data.get('shipping_fee', 0),
@@ -119,8 +125,34 @@ class CheckoutRepository:
         product.save()
         return product
         
-    def add_order_items(self, order_number : str, cart : Cart):
+    def add_order_item(
+        self, 
+        order : Order,
+        product_type : str, 
+        product : Union[Product | ProductVariant], 
+        product_name : str,
+        product_attributes : dict,
+        unit_price : float,
+        quantity : int,
+        total_price : float,
+        img_src : str
+        ):
         """
-        Attach cart items into a order
-        """        
+        Create an order item record
+        """
+        order_item = OrderItem.objects.create(
+            order_id=order.id,
+            product_name=product_name,
+            attributes=product_attributes,
+            unit_price=unit_price,
+            quantity=quantity,
+            total_price=total_price,
+            image_url=img_src
+        )
+        if product_type == 'variant':
+            order_item.variant = product
+        else:
+            order_item.product = product
+        order_item.save()
         
+        return order_item

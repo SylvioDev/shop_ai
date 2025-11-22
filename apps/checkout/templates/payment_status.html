@@ -38,8 +38,11 @@
                     </div>
                 </div>
 
-                <button class="btn btn-custom btn-success-custom" onclick="downloadReceipt()">
-                    <i class="bi bi-download me-2"></i>Download Receipt
+                <button class="btn btn-custom btn-success-custom" >
+                    <i class="bi bi-receipt me-2"></i>
+                    <a href="{% url 'process-receipt' order.order_number %}" class="text-white text-decoration-none">
+                        View Receipt
+                    </a>
                 </button>
                 <button class="btn btn-custom btn-outline-custom" onclick="goToHome()">
                     <i class="bi bi-house me-2"></i>Go to Home
