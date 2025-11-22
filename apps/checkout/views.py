@@ -109,7 +109,7 @@ def payment_status(request, order_id : str):
     payment = Payment.objects.get(order=order)
     
     if order.status == 'paid':
-        cart.clear() # Clear user cart
+        request.session['cart'] = {} # Clear user cart
         
     return render(
         request, 
