@@ -38,7 +38,7 @@ class CheckoutRepository:
         order.save()
         return order
     
-    def create_payment(self, order : Order, payment_method : str, amount : float) -> Payment:
+    def create_payment(self, order : Order, payment_provider : str, amount : float) -> Payment:
         """
         Create a new payment record in the repository.
 
@@ -52,7 +52,7 @@ class CheckoutRepository:
         """
         payment = Payment.objects.create(
             order=order,
-            method=payment_method,
+            provider=payment_provider,
             status='pending',
             amount=amount
         )

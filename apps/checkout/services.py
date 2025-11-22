@@ -11,6 +11,7 @@ import stripe
 from datetime import timezone, datetime
 from .payment_service import StripePaymentService
 from apps.users.repositories import UserRepository
+from stripe.checkout import Session
         
 class CheckoutService:
     """
@@ -73,7 +74,7 @@ class CheckoutService:
         order.save()
         return order
     
-    def payment_creation(self, order : Order, payment_method : str):
+    def payment_creation(self, order : Order, payment_provider : str):
         """
         Responsible for creating a payment record for the order.
         Args:
@@ -82,7 +83,7 @@ class CheckoutService:
 
         """
         amount = order.final_total
-        payment = self.repo.create_payment(order, payment_method, amount)
+        payment = self.repo.create_payment(order, payment_provider, amount)
         return payment
     
     def add_order_items(self, order : Order, cart : dict):
@@ -106,7 +107,7 @@ class CheckoutService:
             )
         return order_item
     
-    def handle_success_payment_status(self, session, order_id : str, user_id : User):
+    def handle_success_payment_status(self, session : Session, order_id : str, user_id : User):
         """
         Handle payment status for authenticated users.
         """
@@ -117,13 +118,15 @@ class CheckoutService:
         
         # retrieve stripe payment intent 
         pi = stripe.PaymentIntent.retrieve(session.payment_intent)
+        print(pi.customer)
         # Update payment model
         payment.transaction_id = pi.latest_charge
         payment.status = 'success'
-        payment.amount = session.amount_total
+        payment.amount = session.amount_total / 100
         payment.paied_at = datetime.fromtimestamp(pi.created, tz=timezone.utc)
         payment.method = session.payment_method_types[0]
         payment.stripe_payment_intent_id = session.payment_intent
+        payment.currency = session.currency.upper()
         payment.save()
     
         payment = Payment.objects.get(order=order.id)

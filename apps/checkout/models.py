@@ -54,10 +54,13 @@ class OrderItem(models.Model):
     
 class Payment(models.Model):
 
-    PAYMENT_METHODS = [
+    PAYMENT_PROVIDERS = [
         ('paypal', 'Paypal'),
         ('stripe', 'Stripe'),
-        ('credit_card', 'Credit Card'),
+    ]
+    
+    PAYMENT_METHODS = [
+        ('card', 'Credit Card'),
         ('cash_on_delivery', 'Cash on Delivery')
     ]
 
@@ -68,6 +71,7 @@ class Payment(models.Model):
     ]
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
     method = models.CharField(choices=PAYMENT_METHODS)
+    provider = models.CharField(choices=PAYMENT_PROVIDERS, default=('stripe'))
     status = models.CharField(choices=PAYMENT_STATUS)
     stripe_payment_intent_id = models.TextField(default='67N9717781765035V', null=True)
     stripe_session_id = models.TextField(default='1234')

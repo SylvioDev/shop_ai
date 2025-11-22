@@ -13,7 +13,7 @@ from .models import (
     Order,
     Payment
 )
-import json
+
 
 logger = logging.getLogger(__name__)
 

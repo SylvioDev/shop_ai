@@ -27,6 +27,7 @@ from .models import (
     OrderItem,
     Order
 )
+from django.urls import reverse
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -69,8 +70,10 @@ def payment_processing(request):
     try:
         # Order and payment initialization
         order = CheckoutService().order_creation(cart, request.user)
-        payment = CheckoutService().payment_creation(order=order, payment_method='stripe')
+        payment = CheckoutService().payment_creation(order=order, payment_provider="stripe")
         checkout_session = StripePaymentService().create_session(cart, request.user, order, payment)
+        order.final_total = checkout_session.amount_total / 100
+        order.save()
         CheckoutService().add_order_items(order, cart=cart.cart)
     except ValueError as error:
         return JsonResponse({'status':'error', 'error': str(error)})
@@ -106,17 +109,18 @@ def payment_status(request, order_id : str):
     user = request.user
     cart = Cart.from_request(request)
     order = Order.objects.get(order_number=order_id)
-    payment = Payment.objects.get(order=order)
     
     if order.status == 'paid':
+        payment = Payment.objects.get(order=order)
         request.session['cart'] = {} # Clear user cart
+        cart_len = 0
         
     return render(
         request, 
         'payment_status.html', 
         {   
             'order_status' : order.status,
-            'count' : len(cart) if cart else 0,
+            'count' : cart_len,
             'payment' : payment,
             'order' : order
         }
