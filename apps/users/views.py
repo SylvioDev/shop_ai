@@ -111,7 +111,8 @@ class LoginView(FormView):
             obj_user = LoginService().valid_user(form_data=form.cleaned_data)
             if obj_user.get('user'):
                 auth_login(self.request, obj_user.get('user'))
-                return redirect(self.success_url)
+                next_url = request.POST.get('next') or request.GET.get('next') or self.success_url
+                return redirect(next_url)
             else:
                 error = LoginService().valid_user(form.cleaned_data).get('error')
                 return render(self.request, self.template_name, {'form' : form, 'error':error})
