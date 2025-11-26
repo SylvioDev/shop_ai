@@ -57,9 +57,10 @@ def review_cart(request):
         return JsonResponse({
             'status':'success',
             'message' : 'cart is valid',
-        })
+            
+        },status=200)
     except (EmptyCartError, OutOfStockError) as error:
-        return JsonResponse({'status':'error', 'error': str(error)})
+        return JsonResponse({'status':'error', 'error': str(error)}, status=400)
 
 @login_required
 def payment_processing(request):
@@ -78,10 +79,10 @@ def payment_processing(request):
         order.save()
         CheckoutService().add_order_items(order, cart=cart.cart)
     except ValueError as error:
-        return JsonResponse({'status':'error', 'error': str(error)})
+        return JsonResponse({'status':'error', 'error': str(error)}, status=400)
     
     if 'error' in checkout_session:
-        return JsonResponse({'status':'error', 'error': checkout_session.get('error')})
+        return JsonResponse({'status':'error', 'error': checkout_session.get('error')}, status=500)
     
     return redirect(checkout_session.url, code=303)
     
