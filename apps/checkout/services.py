@@ -118,7 +118,6 @@ class CheckoutService:
         
         # retrieve stripe payment intent 
         pi = stripe.PaymentIntent.retrieve(session.payment_intent)
-        print(pi.customer)
         # Update payment model
         payment.transaction_id = pi.latest_charge
         payment.status = 'success'

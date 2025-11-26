@@ -75,7 +75,7 @@ const csrftoken = getCookie('csrftoken');
                     .then(data => {
     
                         if (data["status"] == "success"){
-                            showSuccessModal("Redirecting to Stripe payment page ...");
+                            showSuccessModal("Redirecting to payment confirmation page ...");
                             setTimeout(() => {
                                 window.location = BuildUrl('checkout/confirm');
                             }, 2000);
@@ -113,7 +113,7 @@ const csrftoken = getCookie('csrftoken');
         icon.innerHTML = '<i class="bi bi-check-circle-fill"></i>';
         title.textContent = 'Cart validation successful';
         message.textContent = msg;//"Your order has been placed successfully. We'll send you a confirmation email shortly.";
-        orderNum.textContent = `Order #ORD-${new Date().getFullYear()}-${Math.floor(Math.random() * 900000 + 100000)}`;
+        //orderNum.textContent = `Order #ORD-${new Date().getFullYear()}-${Math.floor(Math.random() * 900000 + 100000)}`;
         orderNum.style.display = 'block';
         
         modal.classList.add('show');
