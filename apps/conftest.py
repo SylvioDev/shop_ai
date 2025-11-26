@@ -12,6 +12,8 @@ from apps.factories import \
     CategoryFactory
 )
 from django.conf import settings
+from django.contrib.auth.models import User
+from apps.users.models import Address
 import tempfile
 import shutil
 
@@ -96,3 +98,23 @@ def variant_product(variant_sku):
     variant_product.save()
 
     return variant_product
+
+
+@pytest.fixture
+def valid_user():
+    user = User.objects.create_user(
+        username='test',
+        email='test@example.com',
+        password='mypassword'
+    )
+    user.save()
+    address = Address.objects.create(
+        user=user,
+        address_type='shipping',
+        city='Bruxelles',
+        state = 'Bruxelles',
+        country = 'Switzerland',
+        zip_code = 70028
+    )
+    address.save()
+    return user

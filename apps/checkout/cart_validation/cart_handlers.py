@@ -39,7 +39,7 @@ class OutOfStockHandler(BaseHandler):
                 )
         
         if invalid_products:
-            message = 'There was an issue with your payment.'
+            message = 'There was an issue with your cart'
             for product in invalid_products:
                 message += f"\n Not enough stock for \"{product.get('product_name')}\" . Only {product.get('stock_quantity')} left."
             raise OutOfStockError(message)

@@ -1,6 +1,6 @@
 class EmptyCartError(Exception):
     def __init__(self):
-        self.message = "Your cart is empty. Please add some products to continue shopping."
+        self.message = "Your cart is empty. Add items to proceed."
         super().__init__(self.message)
 
 class OutOfStockError(Exception):
