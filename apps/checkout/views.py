@@ -110,6 +110,7 @@ def payment_status(request, order_id : str):
     """
     order = Order.objects.get(order_number=order_id)
     payment = Payment.objects.get(order=order)
+    cart = Cart.from_request(request)
     
     if payment.status == 'success':
         request.session['cart'] = {} # Clear user cart
@@ -128,7 +129,8 @@ def payment_status(request, order_id : str):
     else:
         context = {
             'payment' : payment,
-            'failure_reason' : 'Connection error with Stripe Server '
+            'failure_reason' : 'Connection error with Stripe Server ',
+            'count' : len(cart)
         }
         return render(
             request,
