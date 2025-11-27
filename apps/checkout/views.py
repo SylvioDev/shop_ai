@@ -74,6 +74,7 @@ def payment_processing(request):
         payment = CheckoutService().payment_creation(order=order, payment_provider="stripe")
         checkout_session = StripePaymentService().create_session(cart, request.user, order, payment)
         payment.stripe_payment_intent_id = checkout_session.payment_intent
+        payment.stripe_session_id = checkout_session.id
         payment.save()
         order.final_total = checkout_session.amount_total / 100
         order.save()
@@ -98,30 +99,45 @@ def stripe_webhook(request):
         return HttpResponse(status=400)
     return HttpResponse(status=200)
 
-def success(request, order_id):
-    return redirect(f'/checkout/payment_status/{order_id}')
-
-def cancel(request, order_id : str):
-    return redirect(f'/checkout/payment_status/{order_id}')
+def success(request):
+    order_id = request.GET.get('order_id')
+    session_id = request.GET.get('session_id')
+    return redirect(f'/checkout/payment_status/?order_id={order_id}&session_id={session_id}')
+    
+def cancel(request):
+    order_id = request.GET.get('order_id')
+    session_id = request.GET.get('session_id')
+    return redirect(f"/checkout/payment_status/?order_id={order_id}&session_id={session_id}")
 
 @login_required
-def payment_status(request, order_id : str):
+def payment_status(request):
     """ 
     Handle payment status 
     """
+    user = request.user
+    order_id = request.GET.get('order_id')
+    session_id = request.GET.get('session_id')
+    session = stripe.checkout.Session.retrieve(session_id, expand=['payment_intent'])
     order = Order.objects.get(order_number=order_id)
-    payment = Payment.objects.get(order=order)
     cart = Cart.from_request(request)
+    payment = Payment.objects.get(order=order)
     
-    if payment.status == 'success':
+    if session.payment_status == 'paid':
         request.session['cart'] = {} # Clear user cart
         cart_len = 0
-    
+        if payment.status == 'pending':
+            updated_order, updated_payment = CheckoutService().handle_webhook_fallback(
+                session_id=session_id,
+                order_id=order_id,
+                user_id=user.id
+            )
+            order = updated_order
+            payment = updated_payment
         return render(
             request, 
             'payment_status.html', 
             {   
-                'order_status' : order.status,
+                'payment_status' : session.payment_status,
                 'count' : cart_len,
                 'payment' : payment,
                 'order' : order
@@ -130,7 +146,7 @@ def payment_status(request, order_id : str):
     else:
         context = {
             'payment' : payment,
-            'failure_reason' : 'Connection error with Stripe Server ',
+            'failure_reason' : order.failure_reason,
             'count' : len(cart)
         }
         return render(

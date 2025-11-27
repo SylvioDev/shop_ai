@@ -121,6 +121,8 @@ class CheckoutRepository:
         Decrease stock of purchased product
         """
         product = ProductRepository().get_by_sku(product_sku)['product']
+        if quantity > product.stock:
+            raise ValueError(f'Not enough stock for product "{product.name}", only {product.stock} available')
         product.stock -= quantity
         product.save()
         return product
