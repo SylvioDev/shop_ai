@@ -113,8 +113,8 @@ class StripePaymentService:
                 payment_method_types=['card'],
                 line_items=line_items,
                 mode='payment',
-                success_url=settings.DOMAIN_URL + f'checkout/success/{order.order_number}',
-                cancel_url=settings.DOMAIN_URL + f'checkout/cancel/{order.order_number}',
+                success_url=settings.DOMAIN_URL + f'checkout/success/?order_id={order.order_number}&session_id={{CHECKOUT_SESSION_ID}}',
+                cancel_url=settings.DOMAIN_URL + f'checkout/cancel/?order_id={order.order_number}&session_id={{CHECKOUT_SESSION_ID}}',
                 metadata={
                         'user_id' : user.id,
                         'order_id' : order.order_number,
@@ -189,7 +189,7 @@ class StripePaymentService:
             # local import to avoid circular import with services.py
             from .services import CheckoutService
             CheckoutService().handle_success_payment_status(
-                session=session,
+                session_id=session.id,
                 order_id=order_number,
                 user_id=int(user_id)
             )
@@ -197,8 +197,15 @@ class StripePaymentService:
             pass
             #cls.handle_payment_intent_succeeded(event.data.object)
         elif event.type == 'payment_intent.payment_failed':
-            pass
-            #cls.handle_payment_intent_failed(event.data.object)
+            intent = event['data']['object']
+            error_message = intent['last_payment_error']['message'] if intent.get('last_payment_error') else None
+            logger.error(f"Payment failed : {intent['id']}, reason : {error_message}")
+            from .services import CheckoutService
+            CheckoutService().handle_failure_payment_status(
+                order_id=intent.get('metadata')['order_id'],
+                user_id=intent.get('metadata')['user_id'],
+                error_message=error_message
+            )
         else:
             logger.info(f"Unhandled event type {event.type}")
         

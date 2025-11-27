@@ -31,6 +31,7 @@ class Order(models.Model):
     shipping_address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, related_name='shipping_address')   
     final_total = models.DecimalField(max_digits=10, decimal_places=2)
     cart = models.JSONField(default=dict)
+    failure_reason = models.CharField(max_length=300, null=True)
     
     def save(self, force_insert = False , *args, **kwargs):
         year = datetime.now().year

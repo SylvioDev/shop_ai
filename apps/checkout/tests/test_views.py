@@ -38,7 +38,7 @@ def log_user(client, valid_user, home_url, login_url):
     third_response = client.get(other_response.url)
     
     
-class TestCheckoutHomePage:
+class TestCheckoutHomePageView:
     def test_homepage_redirect_not_authenticated(self, client, home_url):
         response = client.get(home_url)
         assert response.status_code == 302
@@ -68,7 +68,7 @@ class TestCheckoutHomePage:
 def cart_url():
     return reverse('review')
     
-class TestCartReview:
+class TestCartReviewView:
     def test_cart_review_empty_cart(self, client, cart_url, log_user):
         response = client.get(cart_url)
         assert response.status_code == 400
@@ -104,3 +104,5 @@ class TestCartReview:
         success_message = json.loads(response.content.decode()).get('message')
         assert success_message == 'cart is valid'
 
+class TestPaymentProcessingView:
+    pass

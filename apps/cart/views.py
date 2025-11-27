@@ -108,12 +108,12 @@ def update_quantity(request : HttpRequest, product_sku : str, product_quantity :
             'message' : f'Quantity of "{product_sku} updated successfully',
             'cart_summary' : cart_summary,
             'cart' : cart.cart
-        })
+        }, status=200)
     else:
         return JsonResponse({
             "status" : "error",
             "message" : f"product '{product_sku}' doesn't exist"
-        })    
+        }, status=400)    
 
 def delete_product(request : HttpRequest, product_sku : str) -> dict:
     """

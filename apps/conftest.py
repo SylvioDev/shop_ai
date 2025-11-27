@@ -1,5 +1,6 @@
 import pytest
 import factory
+import uuid
 from apps.factories import \
 (
     ProductFactory,
@@ -114,7 +115,26 @@ def valid_user():
         city='Bruxelles',
         state = 'Bruxelles',
         country = 'Switzerland',
-        zip_code = 70028
+        zip_code = 70028,
+        street_address='Hans Meier Gerechtigkeistgasse 10 3011 Berne'
     )
     address.save()
     return user
+
+def checkout_user(username, user_address):
+    user = User.objects.create_user(
+        username=username,
+        email=f'{username}@example.com',
+        password='password'
+    )
+    address = Address.objects.create(
+        user=user,
+        address_type='shipping',
+        city='New York',
+        state = 'New York',
+        country = 'US',
+        zip_code = 10028,
+        street_address=user_address
+    )
+    return user
+

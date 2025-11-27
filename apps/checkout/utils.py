@@ -12,3 +12,4 @@ def format_timestamp(timestamp):
     """
     dt_object = datetime.fromtimestamp(timestamp)
     return dt_object.strftime("%Y-%m-%d %H:%M:%S")
+
