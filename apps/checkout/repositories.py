@@ -111,7 +111,7 @@ class CheckoutRepository:
         
         """
         order = Order.objects.get(order_number=order_number)
-        if order.customer_id.id == user_id:
+        if order.customer_id == user_id:
             return order
         else:
             raise ValueError('You don\'t have permission to view this order')

@@ -15,6 +15,8 @@ from apps.factories import \
 from django.conf import settings
 from django.contrib.auth.models import User
 from apps.users.models import Address
+from apps.checkout.repositories import CheckoutRepository
+from apps.cart.cart import Cart
 import tempfile
 import shutil
 
@@ -138,3 +140,30 @@ def checkout_user(username, user_address):
     )
     return user
 
+#### Checkout app fixtures ####
+
+@pytest.fixture
+def cart_data(sku, variant_sku, product, variant_product):
+    cart = Cart({})
+    cart.add(sku, quantity=4)
+    cart.add(variant_sku, quantity=2)
+    return cart
+    
+@pytest.fixture
+def cart_summary_test(cart_data):
+    return cart_data.get_cart_summary()
+
+@pytest.fixture
+def total_amount_test(cart_summary_test):
+    output = cart_summary_test.get('subtotal_price') + cart_summary_test.get('taxes') + cart_summary_test.get('shipping_fee')
+    return output
+
+def user_order(cart_data, username, user_address):
+    cart_summary = cart_data.get_cart_summary()
+    total_amount = cart_summary.get('subtotal_price') + cart_summary.get('taxes') + cart_summary.get('shipping_fee')
+    order = CheckoutRepository().create_order(
+        user=checkout_user(username=username, user_address=user_address),
+        cart_data=cart_summary,
+        total_amount=total_amount
+    )
+    return order    

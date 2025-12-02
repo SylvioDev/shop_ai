@@ -10,8 +10,6 @@ from apps.products.repositories import ProductRepository
 import stripe
 from datetime import timezone, datetime
 from .payment_service import StripePaymentService
-from apps.users.repositories import UserRepository
-from stripe.checkout import Session
         
 class CheckoutService:
     """
@@ -164,8 +162,8 @@ class CheckoutService:
         payment.currency = session.currency.upper()
         payment.stripe_session_id = session.id
         payment.save()
-    
-        payment = Payment.objects.get(order=order.id)
+        
+        #payment = Payment.objects.get(order=order.id)
         payment_details = StripePaymentService().payment_details(payment)
         
         # Decrease stock
@@ -173,9 +171,9 @@ class CheckoutService:
         for sku, product in cart.items():
             CheckoutRepository().decrease_stock(product_sku=sku, quantity=product.get('quantity'))
             
-        return order
+        return paid_order
          
-    def handle_failure_payment_status(self, order_id : str, user_id : str, error_message : str):
+    def handle_failure_payment_status(self, order_id : str, user_id : User, error_message : str):
         """
         Handle a failed payment for a given order.
         Update the order and associated payment records when a payment attempt fails. 
@@ -197,8 +195,9 @@ class CheckoutService:
         updated_order.save()
         payment = CheckoutRepository().update_payment_status(order.order_number, 'failed')
         payment.save()
+        return updated_order
     
-    def handle_webhook_fallback(self, session_id : str, order_id : str, user_id : str):
+    def handle_webhook_fallback(self, session_id : str, order_id : str, user_id : User):
         """
         Handle webhook issues. Update database for payment and order when webhook endpoint
         is down. 
