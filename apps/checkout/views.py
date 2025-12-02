@@ -129,7 +129,7 @@ def payment_status(request):
             updated_order, updated_payment = CheckoutService().handle_webhook_fallback(
                 session_id=session_id,
                 order_id=order_id,
-                user_id=user.id
+                user_id=user
             )
             order = updated_order
             payment = updated_payment

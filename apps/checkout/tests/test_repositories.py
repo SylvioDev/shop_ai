@@ -6,6 +6,9 @@ from apps.conftest import (
     product,
     checkout_user,
     ProductImageFactory,
+    cart_data,
+    cart_summary_test,
+    user_order
 )
 from apps.cart.cart import Cart
 from apps.checkout.repositories import CheckoutRepository, Order
@@ -17,31 +20,6 @@ from apps.products.repositories import ProductRepository
 
 pytestmark = pytest.mark.django_db
 
-@pytest.fixture
-def cart_data(sku, variant_sku, product, variant_product):
-    cart = Cart({})
-    cart.add(sku, quantity=4)
-    cart.add(variant_sku, quantity=2)
-    return cart
-    
-@pytest.fixture
-def cart_summary_test(cart_data):
-    return cart_data.get_cart_summary()
-
-@pytest.fixture
-def total_amount_test(cart_summary_test):
-    output = cart_summary_test.get('subtotal_price') + cart_summary_test.get('taxes') + cart_summary_test.get('shipping_fee')
-    return output
-
-def user_order(cart_data, username, user_address):
-    cart_summary = cart_data.get_cart_summary()
-    total_amount = cart_summary.get('subtotal_price') + cart_summary.get('taxes') + cart_summary.get('shipping_fee')
-    order = CheckoutRepository().create_order(
-        user=checkout_user(username=username, user_address=user_address),
-        cart_data=cart_summary,
-        total_amount=total_amount
-    )
-    return order    
 
 class TestCheckoutRepository:        
     def test_create_order(self, cart_data, total_amount_test, cart_summary_test):
