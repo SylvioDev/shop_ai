@@ -1,8 +1,3 @@
-from .repositories import (
-    SignupRepository,
-    LoginRepository,
-    UserRepository
-)
 from django.contrib.auth import get_backends
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode
@@ -62,8 +57,8 @@ class SignupService:
 
     """
     
-    def __init__(self):
-        self.repo = SignupRepository()
+    def __init__(self, signup_repo):
+        self.repo = signup_repo
 
     def signup_user(self, domain : str, form_data : dict) -> User:
         """
@@ -102,8 +97,8 @@ class LoginService:
         repo (LoginRespository) : The repository instance used for database interactions.
     
     """
-    def __init__(self):
-        self.repo = LoginRepository()
+    def __init__(self, login_repo):
+        self.repo = login_repo
 
     def valid_user(self, form_data:dict):
         """
@@ -135,16 +130,47 @@ class LoginService:
             return {'error' : 'Invalid username or password'}
 
 class UserService:
-    def __init__(self):
-        self.repository = UserRepository()
+    """
+    Service layer handling business logic for user-related operations.
+    This service manages user data retrieval and profile management.
     
+    Attributes:
+        repository (UserRepository) : The repository instance used for database interactions.
+    
+    Methods:
+        get_user_credentials(user_id : int) -> User:
+            Retrieves user credentials by user ID.
+
+        get_user_address(user_instance) -> Address:
+            Retrieves the address associated with a user instance. 
+    """
+    def __init__(self, user_repo):
+        self.repository = user_repo
+        
     def get_user_credentials(self, user_id : int):
+        """
+        Retrieve user credentials by user ID.
+        
+        Args:
+            user_id (int): The user ID. 
+            
+        Returns:
+            User instance corresponding to the given user ID.       
+        """
         user = self.repository.retrieve_user(user_id)
         return user
     
-    @staticmethod
-    def get_user_address(user_instance):
-        user_address = UserService().repository.retrieve_adress(user_instance)
+    def get_user_address(self, user_instance):
+        """
+        Retrieve the address associated with a user instance.
+        
+        Args:
+            user_instance (int): The user instance or user ID.
+            
+        Returns:
+            Address instance associated with the user.
+        """
+        user_address = self.repository.retrieve_adress(user_instance)
         return user_address
 
 

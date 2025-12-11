@@ -1,12 +1,14 @@
+from apps.container import container
 import pytest
 from unittest.mock import MagicMock
-from apps.checkout.payment_service import StripePaymentService
-from apps.checkout.repositories import CheckoutRepository
 from apps.conftest import (
     user_order,
     Cart,
     sku,
-    product
+    product,
+    order_data,
+    payment_data,
+    mock_session
 )
 from django.conf import settings
 import stripe
@@ -14,21 +16,9 @@ from apps.checkout.custom_exceptions import (
     InvalidPayloadException,
     InvalidSignatureException
 )
-from apps.checkout.services import CheckoutService
-        
-@pytest.fixture
-def order_data(cart_data):
-    order = user_order(cart_data, 'Paul', '78th street')
-    return order
+from apps.checkout.payment_service import StripePaymentService
+from apps.checkout.repositories import CheckoutRepository
 
-@pytest.fixture
-def payment_data(cart_data, order_data):
-    payment = CheckoutRepository().create_payment(
-        order=order_data,
-        payment_provider='Stripe',
-        amount=cart_data.get_cart_summary()['total_price']
-    )
-    return payment
 
 @pytest.fixture
 def fake_secret():
@@ -41,16 +31,6 @@ def fake_payload():
 @pytest.fixture
 def fake_header():
     return 'fake-header'
-
-@pytest.fixture
-def mock_session(cart_data, order_data, payment_data):
-    checkout_session = StripePaymentService().create_session(
-        cart=cart_data,
-        user=order_data.customer_id,
-        order=order_data,
-        payment=payment_data
-    )
-    return checkout_session
 
 @pytest.fixture
 def fake_pi():
@@ -129,12 +109,12 @@ pytestmark = pytest.mark.django_db
 
 class TestStripePaymentService:    
     def test_initialization(self):
-        service = StripePaymentService()
+        service = container.payment_service
         assert isinstance(service, StripePaymentService)
         assert isinstance(service.repo, CheckoutRepository)
     
     def test_create_cart_checkout(self, cart_data):
-        line_items = StripePaymentService().create_cart_checkout(cart_data)
+        line_items = container.payment_service.create_cart_checkout(cart_data)
         assert isinstance(line_items, list)
         assert len(line_items) == 4
         index = 0
@@ -148,11 +128,11 @@ class TestStripePaymentService:
         cart = Cart({})
         order = user_order(cart, 'Paul', '78th street')
         with pytest.raises(ValueError) as exc_info:
-            checkout_session = StripePaymentService().create_session(
+            checkout_session = container.payment_service.create_session(
                 cart=cart,
                 user=order.customer_id,
                 order=order,
-                payment=CheckoutRepository().create_payment(order,'Stripe',8000)
+                payment=container.checkout_repo.create_payment(order,'Stripe',8000)
             )
         assert 'Cart is empty. Cannot create checkout session.' == str(exc_info.value)
     
@@ -180,7 +160,7 @@ class TestStripePaymentService:
         mocker.patch('stripe.checkout.Session.create', side_effect=exception)#Exception('Stripe is down'))
         
         # ---- 2. Call the function under test ----
-        response = StripePaymentService().create_session(
+        response = container.payment_service.create_session(
             cart=cart_data,
             user=order_data.customer_id,
             order=order_data,
@@ -191,7 +171,7 @@ class TestStripePaymentService:
         assert "error" in response.content.decode()
     
     def test_payment_details(self, payment_data):
-        output = StripePaymentService().payment_details(payment=payment_data)
+        output = container.payment_service.payment_details(payment=payment_data)
         assert isinstance(output, dict)
         assert output.get('transaction_id') == 'SDQSA'
         assert output.get('amount_paid') == payment_data.amount / 100
@@ -203,14 +183,14 @@ class TestStripePaymentService:
         error_message = 'Invalid payload received in Stripe webhook.'
         mocker.patch('stripe.Webhook.construct_event', side_effect=ValueError(error_message))
         with pytest.raises(InvalidPayloadException) as exc_info:
-            response = StripePaymentService().handle_webhook(fake_payload, fake_header)
+            response = container.payment_service.handle_webhook(fake_payload, fake_header)
         assert str(exc_info.value) == error_message        
     
     def test_handle_webhook_failed_signature(self, mocker, fake_payload, fake_header):
         error_message = 'Invalid signature in Stripe webhook.'
         mocker.patch('stripe.Webhook.construct_event', side_effect=InvalidSignatureException(error_message))
         with pytest.raises(InvalidSignatureException) as exc_info:
-            response = StripePaymentService().handle_webhook(fake_payload, fake_header)
+            response = container.payment_service.handle_webhook(fake_payload, fake_header)
         assert str(exc_info.value) == error_message        
     
     def test_webhook_session_completed(self, mocker, fake_session, fake_event, fake_pi, order_data, fake_payload, fake_header):
@@ -219,9 +199,9 @@ class TestStripePaymentService:
         mocker.patch('stripe.PaymentIntent.retrieve', return_value=fake_pi)
         mocker.patch('apps.checkout.services.CheckoutService.handle_success_payment_status')
         
-        StripePaymentService().handle_webhook(fake_payload, fake_header)
+        container.payment_service.handle_webhook(fake_payload, fake_header)
         
-        CheckoutService().handle_success_payment_status.assert_called_once_with(
+        container.checkout_service.handle_success_payment_status.assert_called_once_with(
             session_id=fake_session.id,
             order_id=order_data.order_number,
             user_id=order_data.customer_id
@@ -242,7 +222,7 @@ class TestStripePaymentService:
             "apps.checkout.services.CheckoutService.handle_failure_payment_status"
         )
 
-        StripePaymentService().handle_webhook(fake_payload, fake_header)
+        container.payment_service.handle_webhook(fake_payload, fake_header)
 
         mock_failure.assert_called_once_with(
             order_id=str(order_data.order_number),

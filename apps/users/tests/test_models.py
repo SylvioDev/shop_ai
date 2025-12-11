@@ -1,6 +1,9 @@
 from django.db import models 
 import pytest
-from apps.users.tests.factories import UserFactory, UserProfileFactory
+from apps.users.tests.factories import (
+    UserFactory, 
+    UserProfileFactory
+)
 from apps.users.models import user_directory_path
 
 pytestmark = pytest.mark.django_db

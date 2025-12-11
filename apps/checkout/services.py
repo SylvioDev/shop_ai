@@ -1,16 +1,13 @@
-from .repositories import CheckoutRepository
+from apps.container import container
 from ..cart.cart import Cart
-from .cart_validation.cart_chain import CartValidationChain
 from .models import (
     Order,
     Payment
 )
 from apps.users.models import User
-from apps.products.repositories import ProductRepository
 import stripe
 from datetime import timezone, datetime
-from .payment_service import StripePaymentService
-        
+
 class CheckoutService:
     """
         Service for handling the checkout process in an e-commerce platform.
@@ -28,12 +25,12 @@ class CheckoutService:
         Methods:
             
     """
-    def __init__(self):
+    def __init__(self, checkout_repo):
         """
         Initialize service with repository dependency.
         """
-        self.repo = CheckoutRepository()
-        self.validation_chain = CartValidationChain()
+        self.repo = checkout_repo
+        self.validation_chain = container.cart_validation
     
     def cart_validation(self, cart : Cart):
         """
@@ -89,10 +86,10 @@ class CheckoutService:
         Attach order items to a particular order
         """
         for sku, item in cart.items():
-            product_dict = ProductRepository().get_by_sku(item.get('sku'))
+            product_dict = container.product_repo.get_by_sku(item.get('sku'))
             product = product_dict['product']
             total_price = item.get('quantity') * item.get('price')
-            order_item = CheckoutRepository().add_order_item(
+            order_item = self.repo.add_order_item(
                 order=order,
                 product=product,
                 product_type=product_dict['product_type'],
@@ -145,8 +142,8 @@ class CheckoutService:
             a transaction if atomicity is required.
     """
         # retrieve user's order
-        order = CheckoutRepository().retrieve_user_order(order_id, user_id=user_id)
-        paid_order = CheckoutRepository().update_order_status(order_id, 'paid')
+        order = self.repo.retrieve_user_order(order_id, user_id=user_id)
+        paid_order = self.repo.update_order_status(order_id, 'paid')
         payment = Payment.objects.get(order=order.id)
         
         # retrieve stripe payment intent 
@@ -163,17 +160,16 @@ class CheckoutService:
         payment.stripe_session_id = session.id
         payment.save()
         
-        #payment = Payment.objects.get(order=order.id)
-        payment_details = StripePaymentService().payment_details(payment)
+        ayment_details = container.payment_service.payment_details(payment)
         
         # Decrease stock
         cart = order.cart
         for sku, product in cart.items():
-            CheckoutRepository().decrease_stock(product_sku=sku, quantity=product.get('quantity'))
+            container.checkout_repo.decrease_stock(product_sku=sku, quantity=product.get('quantity'))
             
         return paid_order
          
-    def handle_failure_payment_status(self, order_id : str, user_id : User, error_message : str):
+    def handle_failure_payment_status(self, order_id : str, user_id : str, error_message : str):
         """
         Handle a failed payment for a given order.
         Update the order and associated payment records when a payment attempt fails. 
@@ -189,11 +185,11 @@ class CheckoutService:
             error_message (str): Human-readable failure reason to store on the order.
         
         """
-        order = CheckoutRepository().retrieve_user_order(order_id, user_id)
-        updated_order = CheckoutRepository().update_order_status(order.order_number, 'cancelled')
+        order = self.repo.retrieve_user_order(order_id, user_id)
+        updated_order = self.repo.update_order_status(order.order_number, 'cancelled')
         updated_order.failure_reason = error_message
         updated_order.save()
-        payment = CheckoutRepository().update_payment_status(order.order_number, 'failed')
+        payment = self.repo.update_payment_status(order.order_number, 'failed')
         payment.save()
         return updated_order
     
@@ -204,7 +200,7 @@ class CheckoutService:
         """
         order = Order.objects.get(order_number=order_id)
         payment = Payment.objects.get(order=order)
-        updated_payment = CheckoutService().handle_success_payment_status(
+        updated_payment = self.handle_success_payment_status(
                 session_id=session_id,
                 order_id=order_id,
                 user_id=user_id
@@ -213,4 +209,34 @@ class CheckoutService:
         order.refresh_from_db()
         return order, payment
 
+    def fetch_checkout_context(self, session_id : str, order_id : str):
+        """
+        Retrieve the Stripe checkout session, Order, and Payment objects.
+        Safely wraps all retrieval logic with unified error handling.
+        
+        Args:
+            session_id (str): The Stripe checkout session ID.
+            order_id (str): The order identifier (order number).
+            
+        Returns:
+            list | str:
+            - On success, returns a list containing:
+                [stripe.checkout.Session, Order, Payment].
+            - On failure, returns a string error message describing the issue.    
+        """
+        try:
+            session = stripe.checkout.Session.retrieve(session_id, expand=['payment_intent'])
+            order = Order.objects.get(order_number=order_id)
+            payment = Payment.objects.get(order=order)
+            return [session, order, payment]
+        except (
+            Order.DoesNotExist, 
+            Payment.DoesNotExist,
+            stripe.APIConnectionError,
+            stripe.InvalidRequestError,
+            stripe.AuthenticationError,
+            stripe.RateLimitError,
+            stripe.CardError
+        ) as error:
+            return str(error)
         

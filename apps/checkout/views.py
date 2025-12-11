@@ -11,9 +11,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import stripe
 from apps.cart.cart import Cart
-from apps.users.services import UserService
-from apps.checkout.services import CheckoutService
-from apps.checkout.payment_service import StripePaymentService
 from .cart_validation.cart_exceptions import (
     EmptyCartError,
     OutOfStockError
@@ -23,11 +20,10 @@ from .custom_exceptions import (
     InvalidSignatureException,
 )
 from .models import (
-    Payment,
     OrderItem,
     Order
 )
-from django.urls import reverse
+from apps.container import container
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -46,14 +42,14 @@ def home(request):
             'count' : len(cart),
             'cart_summary' : cart.get_cart_summary(),
             'user' : user,
-            'user_address' : UserService().get_user_address(user_instance=user.id)
+            'user_address' : container.user_service.get_user_address(user_instance=user.id)
         }
     )
 
 def review_cart(request):
     cart = Cart.from_request(request)
     try:
-        cart_validation = CheckoutService().cart_validation(cart)
+        cart_validation = container.checkout_service.cart_validation(cart)
         return JsonResponse({
             'status':'success',
             'message' : 'cart is valid',
@@ -65,38 +61,60 @@ def review_cart(request):
 @login_required
 def payment_processing(request):
     """
-    Handle payment processing by creating a Stripe checkout session.
-    """
+    Handle payment processing via Stripe.
+    1. Create order and payment records.
+    2. Create Stripe checkout session.
+    3. Redirect user to Stripe checkout page.
+    4. Handle errors appropriately.
+    5. Return JsonResponse with error details if any issues arise.
+    
+    Args:
+        request (HttpRequest): The incoming HTTP request.
+        
+    Returns:
+        HttpResponse: Redirect to Stripe checkout or JsonResponse with error.
+        
+    """ 
     cart = Cart.from_request(request)
     try:
         # Order and payment initialization
-        order = CheckoutService().order_creation(cart, request.user)
-        payment = CheckoutService().payment_creation(order=order, payment_provider="stripe")
-        checkout_session = StripePaymentService().create_session(cart, request.user, order, payment)
+        order = container.checkout_service.order_creation(cart, request.user)
+        payment = container.checkout_service.payment_creation(order=order, payment_provider="stripe")
+        checkout_session = container.payment_service.create_session(cart, request.user, order, payment)
         payment.stripe_payment_intent_id = checkout_session.payment_intent
         payment.stripe_session_id = checkout_session.id
         payment.save()
         order.final_total = checkout_session.amount_total / 100
         order.save()
-        CheckoutService().add_order_items(order, cart=cart.cart)
+        container.checkout_service.add_order_items(order, cart=cart.cart)
     except ValueError as error:
         return JsonResponse({'status':'error', 'error': str(error)}, status=400)
     
-    if 'error' in checkout_session:
+    """if 'error' in checkout_session:
         return JsonResponse({'status':'error', 'error': checkout_session.get('error')}, status=500)
-    
+    """
     return redirect(checkout_session.url, code=303)
     
 @csrf_exempt
 @require_POST
 def stripe_webhook(request):
+    """
+    Handle Stripe webhook events.
+    
+    Args:
+        request (HttpRequest): The incoming HTTP request containing the webhook payload.
+    
+    Returns:
+        HttpResponse: Acknowledgment of the webhook event processing.
+         
+    """
     payload = request.body
     try:
-        event = StripePaymentService.handle_webhook(payload, request.META.get('HTTP_STRIPE_SIGNATURE'))
+        event = container.payment_service.handle_webhook(payload, request.META.get('HTTP_STRIPE_SIGNATURE'))
     except InvalidPayloadException as e:
-        return HttpResponse(status=400)
+        return JsonResponse({'error':str(e)}, status=400)
     except InvalidSignatureException as e:  
-        return HttpResponse(status=400)
+        return JsonResponse({'error':str(e)}, status=400)
     return HttpResponse(status=200)
 
 def success(request):
@@ -114,19 +132,28 @@ def payment_status(request):
     """ 
     Handle payment status 
     """
+    from apps.container import container
     user = request.user
     order_id = request.GET.get('order_id')
     session_id = request.GET.get('session_id')
-    session = stripe.checkout.Session.retrieve(session_id, expand=['payment_intent'])
-    order = Order.objects.get(order_number=order_id)
     cart = Cart.from_request(request)
-    payment = Payment.objects.get(order=order)
     
+    checkout_context = container.checkout_service.fetch_checkout_context(session_id, order_id)
+    
+    if type(checkout_context) == str:
+        return JsonResponse({
+            'status':'error',
+            'error' : checkout_context
+        }, status=500)
+        
+    session = checkout_context[0]
+    order, payment = checkout_context[1], checkout_context[2]
+
     if session.payment_status == 'paid':
         request.session['cart'] = {} # Clear user cart
         cart_len = 0
         if payment.status == 'pending':
-            updated_order, updated_payment = CheckoutService().handle_webhook_fallback(
+            updated_order, updated_payment = container.checkout_service.handle_webhook_fallback(
                 session_id=session_id,
                 order_id=order_id,
                 user_id=user
@@ -152,8 +179,10 @@ def payment_status(request):
         return render(
             request,
             'payment_status.html',
-            context=context
+            context=context,
+            status=500
         )
+    
 class PaymentConfirmView(DetailView):
     """
     Responsible for handling payment confirmation view.
@@ -191,10 +220,11 @@ class PaymentConfirmView(DetailView):
 #### Receipt view ####
 
 def process_receipt(request, order_id : str):
+    from apps.container import container
     order = Order.objects.get(order_number=order_id)
     user = User.objects.get(id=order.customer_id.id)
     full_name = user.first_name + ' ' + user.last_name
-    shipping_address = UserService().get_user_address(user)
+    shipping_address = container.user_service.get_user_address(user)
     order_items = OrderItem.objects.filter(order=order)
     context = {
         'order_id' : order_id,

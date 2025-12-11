@@ -4,7 +4,6 @@ from django.urls import reverse
 from apps.users.models import User
 from apps.users.forms import LoginForm
 from django.utils.http import urlsafe_base64_encode
-from django.utils.http import urlsafe_base64_decode 
 from django.utils.encoding import force_bytes
 import re 
 from django.contrib.auth.tokens import default_token_generator
@@ -34,7 +33,6 @@ def inactive_user():
 @pytest.fixture
 def login_url():
     return reverse('login')
-
 
 #### LoginTest ####
 

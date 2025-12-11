@@ -15,10 +15,11 @@ from apps.factories import \
 from django.conf import settings
 from django.contrib.auth.models import User
 from apps.users.models import Address
-from apps.checkout.repositories import CheckoutRepository
 from apps.cart.cart import Cart
 import tempfile
 import shutil
+from django.urls import reverse
+from apps.container import container
 
 pytestmark = pytest.mark.django_db
 
@@ -102,6 +103,15 @@ def variant_product(variant_sku):
 
     return variant_product
 
+@pytest.fixture
+def mock_session(cart_data, order_data, payment_data):
+    checkout_session = container.payment_service.create_session(
+        cart=cart_data,
+        user=order_data.customer_id,
+        order=order_data,
+        payment=payment_data
+    )
+    return checkout_session
 
 @pytest.fixture
 def valid_user():
@@ -148,6 +158,19 @@ def cart_data(sku, variant_sku, product, variant_product):
     cart.add(sku, quantity=4)
     cart.add(variant_sku, quantity=2)
     return cart
+
+@pytest.fixture
+def payment_process_cart(client, sku, variant_sku, product, variant_product):
+    params = {
+        'product_sku' : sku,
+        'product_quantity' : 4
+    }
+    variant_params = {
+        'product_sku': variant_sku,
+        'product_quantity' : 5
+    }
+    cart_add = client.post(reverse('cart-add', kwargs=params))
+    another_cart_add = client.post(reverse('cart-add', kwargs=variant_params))
     
 @pytest.fixture
 def cart_summary_test(cart_data):
@@ -161,9 +184,23 @@ def total_amount_test(cart_summary_test):
 def user_order(cart_data, username, user_address):
     cart_summary = cart_data.get_cart_summary()
     total_amount = cart_summary.get('subtotal_price') + cart_summary.get('taxes') + cart_summary.get('shipping_fee')
-    order = CheckoutRepository().create_order(
+    order = container.checkout_repo.create_order(
         user=checkout_user(username=username, user_address=user_address),
         cart_data=cart_summary,
         total_amount=total_amount
     )
     return order    
+
+@pytest.fixture
+def order_data(cart_data):
+    order = user_order(cart_data, 'Paul', '78th street')
+    return order
+
+@pytest.fixture
+def payment_data(cart_data, order_data):
+    payment = container.checkout_repo.create_payment(
+        order=order_data,
+        payment_provider='Stripe',
+        amount=cart_data.get_cart_summary()['total_price']
+    )
+    return payment
