@@ -8,7 +8,6 @@ from .models import ProductVariant
 from .models import VariantAttribute
 from .models import VariantImage
 
-
 # Register your models here.
 
 class ProductImageInline(admin.TabularInline):

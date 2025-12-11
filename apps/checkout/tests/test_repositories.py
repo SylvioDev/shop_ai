@@ -1,3 +1,4 @@
+from apps.container import container
 import pytest
 from apps.conftest import (
     sku,
@@ -11,12 +12,10 @@ from apps.conftest import (
     user_order
 )
 from apps.cart.cart import Cart
-from apps.checkout.repositories import CheckoutRepository, Order
-from apps.users.services import UserService
+from apps.checkout.models import Order
 from apps.users.models import User
 from apps.checkout.models import Payment
 from apps.products.models import Product, ProductVariant
-from apps.products.repositories import ProductRepository
 
 pytestmark = pytest.mark.django_db
 
@@ -31,7 +30,7 @@ class TestCheckoutRepository:
         assert order.shipping_address.street_address == '123 East 85th Street, Apt 5G, New York, NY 10028'
         
     def test_create_payment(self, cart_data, cart_summary_test):
-        payment = CheckoutRepository().create_payment(
+        payment = container.checkout_repo.create_payment(
             order=user_order(cart_data, username='Mike', user_address='178 West 98th Street'),
             payment_provider='stripe',
             amount=cart_summary_test.get('total_price')
@@ -50,7 +49,7 @@ class TestCheckoutRepository:
     ])    
     def test_update_order_status(self, cart_data, status, expected_status):
         order = user_order(cart_data, username='Anna', user_address='Address')
-        updated_order = CheckoutRepository().update_order_status(
+        updated_order = container.checkout_repo.update_order_status(
             order_number=order.order_number,
             status=status
         )    
@@ -64,12 +63,12 @@ class TestCheckoutRepository:
     ])
     def test_update_payment_status(self, cart_data, status, expected_status):
         order = user_order(cart_data, username='Illico', user_address='Fake Address')
-        payment = CheckoutRepository().create_payment(
+        payment = container.checkout_repo.create_payment(
             order=order, 
             payment_provider='stripe',
             amount=cart_data.get_cart_summary().get('total_price')
         )
-        updated_payment = CheckoutRepository().update_payment_status(
+        updated_payment = container.checkout_repo.update_payment_status(
             order_number=order.order_number,
             status=status
         )
@@ -77,38 +76,38 @@ class TestCheckoutRepository:
         assert updated_payment.status == expected_status
     
     def test_retrieve_user_order_success(self, cart_data):
-        order = user_order(cart_data, username='Ulyce', user_address='LOT 48 BIS')
-        user = User.objects.get(username='Ulyce')
-        retrieved_order = CheckoutRepository().retrieve_user_order(order.order_number, user.id)
+        order = user_order(cart_data, username='rakoto', user_address='LOT 48 BIS')
+        user = User.objects.get(username='rakoto')
+        retrieved_order = container.checkout_repo.retrieve_user_order(order.order_number, user)
         assert isinstance(retrieved_order, Order)
     
     def test_retrieve_user_order_wrong_user(self, cart_data):
         order = user_order(cart_data, username='Kylian', user_address='LOT 47 AS')
         with pytest.raises(ValueError) as exc_info:
-            retrieved_order = CheckoutRepository().retrieve_user_order(order.order_number, 4)
+            retrieved_order = container.checkout_repo.retrieve_user_order(order.order_number, 4)
         
         assert f"You don't have permission to view this order" == str(exc_info.value)
     
     def test_retrieve_user_order_not_found(self, cart_data):
         user = User.objects.create_user(username='testing', email='testing@example.com',password='pass')
         with pytest.raises(Order.DoesNotExist) as exc_info:
-            retrieved_user = CheckoutRepository().retrieve_user_order('ORD-2025-PPMO74S', user.id)
+            retrieved_user = container.checkout_repo.retrieve_user_order('ORD-2025-PPMO74S', user.id)
         assert "Order matching query does not exist." == str(exc_info.value)
     
     def test_decrease_stock_success(self, cart_data, sku):
-        product = CheckoutRepository().decrease_stock(product_sku=sku, quantity=4)
+        product = container.checkout_repo.decrease_stock(product_sku=sku, quantity=4)
         assert product.stock == 8
     
     def test_decrease_stock_failed(self, cart_data, sku):
         with pytest.raises(ValueError) as exc_info:
-            product = CheckoutRepository().decrease_stock(product_sku=sku, quantity=18)
+            product = container.checkout_repo.decrease_stock(product_sku=sku, quantity=18)
             assert f"Not enough stock for product \"{product.name}\", only {product.stock} available" == str(exc_info.value)
             
     def test_add_order_item_base_product(self, cart_data, sku):
         order = user_order(cart_data, username='Iris', user_address='LOT 45 MS')
-        product = ProductRepository().get_by_sku(sku)['product']
+        product = container.product_repo.get_by_sku(sku)['product']
         assert isinstance(product, Product)
-        order_item = CheckoutRepository().add_order_item(
+        order_item = container.checkout_repo.add_order_item(
             order=order,
             product_type='base',
             product=product,
@@ -127,9 +126,9 @@ class TestCheckoutRepository:
         
     def test_add_order_item_variant_product(self, cart_data, variant_sku):
         order = user_order(cart_data, username='Léa', user_address='LOT 48 MS')
-        variant = ProductRepository().get_by_sku(variant_sku)['product']
+        variant = container.product_repo.get_by_sku(variant_sku)['product']
         assert isinstance(variant, ProductVariant)
-        order_item = CheckoutRepository().add_order_item(
+        order_item = container.checkout_repo.add_order_item(
             order=order,
             product_type='variant',
             product=variant,

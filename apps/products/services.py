@@ -1,4 +1,3 @@
-from .repositories import ProductRepository
 from django.urls import reverse
 from .models import Category
 from ..utils import get_full_image_url
@@ -31,8 +30,8 @@ class ProductService:
             Returns product's discount in percent
 
     """
-    def __init__(self):
-        self.repository = ProductRepository()
+    def __init__(self, product_repo):
+        self.repository = product_repo
     
     def filter_products_by_category(self, category : str) -> list | str:
         """
@@ -112,11 +111,11 @@ class ProductService:
         Returns:
             dict : products informations
         """
-        product_dict = ProductRepository().get_by_sku(sku)
+        product_dict = self.repository.get_by_sku(sku)
         product_variant = product_dict['product']
         if product_dict['product_type'] == 'variant':
-            variant_images = ProductRepository().get_product_image(sku)
-            attributes = ProductRepository().get_variant_attribute(product_variant)
+            variant_images = self.repository.get_product_image(sku)
+            attributes = self.repository.get_variant_attribute(product_variant)
         
             full_image_url = variant_images    
             data = {
@@ -137,7 +136,7 @@ class ProductService:
                 'price' : product.price,
                 'stock' : product.stock,
                 'old_price' : product.old_price,
-                'image' : ProductRepository().get_product_image(sku)
+                'image' : self.repository.get_product_image(sku)
             }
 
         return data

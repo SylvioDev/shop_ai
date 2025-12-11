@@ -1,5 +1,4 @@
 from apps.cart.cart import Cart
-from .repositories import CheckoutRepository
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import JsonResponse
@@ -13,7 +12,6 @@ from .models import (
     Order,
     Payment
 )
-from apps.users.repositories import UserRepository
 
 logger = logging.getLogger(__name__)
 
@@ -34,11 +32,11 @@ class StripePaymentService:
         Methods:
             
     """
-    def __init__(self):
+    def __init__(self, checkout_repo):
         """
         Initialize service with repository dependency.
         """
-        self.repo = CheckoutRepository()
+        self.repo = checkout_repo
         
     def create_cart_checkout(self, cart : Cart):
         """
@@ -105,7 +103,7 @@ class StripePaymentService:
         if len(cart.cart) == 0:
             raise ValueError("Cart is empty. Cannot create checkout session.")  
         
-        line_items = StripePaymentService().create_cart_checkout(cart)
+        line_items = self.create_cart_checkout(cart)
             
         try:
             # Create the checkout session
@@ -180,18 +178,21 @@ class StripePaymentService:
 
         # 2 Handle event types as needed
         
+        # Lazy import
+        from apps.container import container
+
         if event.type == 'checkout.session.completed':
             # Retrieve session variable
             session = event['data']['object']
             order_number = session.get('metadata')['order_id']
             user_id = session.get('metadata')['user_id']
-            # local import to avoid circular import with services.py
-            from .services import CheckoutService
-            CheckoutService().handle_success_payment_status(
+            
+            container.checkout_service.handle_success_payment_status(
                 session_id=session.id,
                 order_id=order_number,
                 user_id=User.objects.get(id=int(user_id))
             )
+            
         elif event.type == 'payment_intent.succeeded':
             pass
             #cls.handle_payment_intent_succeeded(event.data.object)
@@ -200,8 +201,7 @@ class StripePaymentService:
             error_message = intent['last_payment_error']['message'] if intent.get('last_payment_error') else None
             logger.error(f"Payment failed : {intent['id']}, reason : {error_message}")
             
-            from .services import CheckoutService
-            CheckoutService().handle_failure_payment_status(
+            container.checkout_service.handle_failure_payment_status(
                 order_id=intent.get('metadata')['order_id'],
                 user_id=User.objects.get(id=int(intent.get('metadata')['user_id'])),
                 error_message=error_message

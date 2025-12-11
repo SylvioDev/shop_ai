@@ -2,8 +2,6 @@ from django.db import models
 from django.utils.text import slugify
 from django.conf import settings
 import uuid 
-import requests
-
 
 def product_image_path(instance, filename):
     return f'product_images/{instance.product.slug}/{filename}'

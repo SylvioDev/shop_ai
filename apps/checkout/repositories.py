@@ -1,3 +1,4 @@
+from apps.container import container
 from .models import (
     Order,
     OrderItem,
@@ -8,11 +9,9 @@ from apps.products.models import (
     ProductVariant
 )
 from .custom_exceptions import OrderNotFoundError
-from apps.users.services import UserService
 from apps.users.models import User
-from apps.cart.cart import Cart
-from apps.products.repositories import ProductRepository 
 from typing import Union
+
 class CheckoutRepository:
     def create_order(self, user : User, cart_data : dict, total_amount : float) -> Order:
         """
@@ -26,6 +25,7 @@ class CheckoutRepository:
         Returns:
             Order: The created order object.
         """
+
         order = Order.objects.create(
             customer_id=user,
             status='pending',
@@ -33,7 +33,7 @@ class CheckoutRepository:
             final_total=total_amount,
             vat=cart_data.get('taxes', 0),
             shipping_cost=cart_data.get('shipping_fee', 0),
-            shipping_address=UserService().get_user_address(user_instance=user.id)
+            shipping_address=container.user_service.get_user_address(user_instance=user.id)
         )
         order.save()
         return order
@@ -120,7 +120,7 @@ class CheckoutRepository:
         """
         Decrease stock of purchased product
         """
-        product = ProductRepository().get_by_sku(product_sku)['product']
+        product = container.product_repo.get_by_sku(product_sku)['product']
         if quantity > product.stock:
             raise ValueError(f'Not enough stock for product "{product.name}", only {product.stock} available')
         product.stock -= quantity

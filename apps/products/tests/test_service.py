@@ -7,7 +7,7 @@ from apps.conftest import (
     sample_products
 )
 from apps.products.models import Category
-from apps.products.services import ProductService
+from apps.container import container
 
 pytestmark = pytest.mark.django_db
 
@@ -27,7 +27,7 @@ class TestProductService:
         ]
     )
     def test_filter_by_category(self, category, sample_products, input_category, expected_count):
-        result = ProductService().filter_products_by_category(input_category)
+        result = container.product_service.filter_products_by_category(input_category)
         if isinstance(result, str):
             assert result == expected_count
         else:
@@ -37,7 +37,7 @@ class TestProductService:
             assert len(item.keys()) == 9
     
     def test_list_products(self, sample_products):
-        result = ProductService().list_products()
+        result = container.product_service.list_products()
         assert isinstance(result, dict)
         assert 'products' in result.keys()
         assert 'categories' in result.keys()
@@ -46,12 +46,12 @@ class TestProductService:
 
     def test_calculate_discount(self, product):
         product.old_price = 18.00
-        discount = ProductService().calculate_discount(product)
+        discount = container.product_service.calculate_discount(product)
         assert isinstance(discount, float)
         assert round(discount) == 33
 
     def test_update_product_variant(self, variant_sku, variant_product):
-        result = ProductService().update_product_variant(variant_sku)
+        result = container.product_service.update_product_variant(variant_sku)
         assert isinstance(result, dict)
         assert result['product_type'] == 'variant'
         assert result['title'] == variant_product.identifiant
@@ -65,7 +65,7 @@ class TestProductService:
         }
     
     def test_update_product_variant_base(self, sku, product):
-        result = ProductService().update_product_variant(sku)
+        result = container.product_service.update_product_variant(sku)
         assert isinstance(result, dict)
         assert result['product_type'] == 'base'
         assert result['title'] == product.name

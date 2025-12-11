@@ -1,14 +1,10 @@
 from django.http import JsonResponse
 from django.views.generic import ListView
 from django.views.generic import DetailView
-from .models import Product
 from .models import *
-from django.contrib.sites.shortcuts import get_current_site
-from shop_ai.settings import MEDIA_URL
 from django.http import HttpResponse
 from django.shortcuts import render
-from .services import ProductService
-from .repositories import ProductRepository
+from apps.container import container
 
 def filter_category(request, category : str):
     """
@@ -29,7 +25,7 @@ def filter_category(request, category : str):
         
     """
     if request.method == 'POST' or request.method == 'GET':
-        products = ProductService().filter_products_by_category(category)
+        products = container.product_service.filter_products_by_category(category)
         if products == 'Error':
             return JsonResponse({
                 'status' : 'error',
@@ -63,7 +59,7 @@ class ListProductsView(ListView):
     template_name = 'products.html'
 
     def get(self, request): 
-        data = ProductService().list_products()
+        data = container.product_service.list_products()
         return render(
             request, 
             self.template_name , 
@@ -101,7 +97,7 @@ class ProductDetail(DetailView):
             return JsonResponse({'message' : f'Product with slug "{slug}" does\'t exist'})
 
         variants = ProductVariant.objects.filter(product=product)
-        attributes = ProductRepository().get_variant_attribute(variants[0].id) if len(variants) > 0 else None
+        attributes = container.product_repo.get_variant_attribute(variants[0].id) if len(variants) > 0 else None
         cart = request.session.get('cart', {})
         output = {
             'product' : product,
@@ -128,7 +124,7 @@ def update_variant(request, product_sku : str) -> JsonResponse:
         JsonResponse: a dict data with message to indicate if it's a variant or a base product.
 
     """
-    result = ProductService().update_product_variant(product_sku)
+    result = container.product_service.update_product_variant(product_sku)
     output = result
     output['status'] = 'success'
     output['message'] = 'variant' if output['product_type'] == 'variant' else 'no-variant'

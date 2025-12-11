@@ -50,10 +50,24 @@ class LoginRepository:
         return None
     
 class UserRepository:
+    """
+    Service for handling user data retrieval.
+    
+    Methods:
+        - retrieve_user (user_id) -> User : Retrieve user instance by ID.
+        - retrieve_address (user_instance : User) -> Address : Retrieve address for given user. 
+        
+    """
     def retrieve_user(self, user_id) -> User:
+        """
+        Retrieve user instance by ID.
+        """
         return User.objects.filter(id=user_id)
 
     def retrieve_adress(self, user_instance : User):
+        """
+        Retrieve address for given user.
+        """
         user_address = Address.objects.get(user=user_instance)
         return user_address
 
