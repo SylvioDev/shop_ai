@@ -43,7 +43,7 @@ class Order(models.Model):
         return self.order_number
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE,null=True)
     variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE,null=True)
     product_name = models.CharField(max_length=255)
