@@ -18,3 +18,6 @@ apps/cart/tests/__pycache__
 apps/__pycache__
 shop_ai/__pycache__
 
+apps/orders/migrations/__pycache__/__init__.cpython-313.pyc
+shop_ai/__pycache__/settings.cpython-313.pyc
+shop_ai/__pycache__/settings.cpython-313.pyc

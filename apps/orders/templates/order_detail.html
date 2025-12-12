@@ -1,0 +1,217 @@
+{% extends 'order_base.html' %}
+
+{% block title %} <title> Order detail </title> {% endblock title %}
+
+{% block content %}
+
+<div class="order-detail-container">
+        <a href="{% url 'orders' %}" class="back-btn">
+            <i class="bi bi-arrow-left"></i>
+            Back to Orders
+        </a>
+
+        <!-- Order Header -->
+        <div class="order-header-section">
+            <div class="order-title">
+                <h1 class="order-number">Order #{{ order.order_number }}</h1>
+                <span class="status-badge status-completed">{{ order.status }}</span>
+            </div>
+            <div class="order-meta">
+                <div class="meta-item">
+                    <div class="meta-icon date">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <div class="meta-content">
+                        <div class="meta-label">Order Date</div>
+                        <div class="meta-value">{{ order.created_at }}</div>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-icon payment">
+                        <i class="bi bi-credit-card"></i>
+                    </div>
+                    <div class="meta-content">
+                        <div class="meta-label">Payment Method</div>
+                        <div class="meta-value">Visa •••• 4242</div>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-icon shipping">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <div class="meta-content">
+                        <div class="meta-label">Delivery</div>
+                        <div class="meta-value">Standard Shipping</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Items -->
+        
+        <div class="order-section">
+            <h2 class="section-title">
+                <i class="bi bi-bag-check"></i>
+                Order Items
+            </h2>
+            
+            {% for order_item in order.items.all %}
+                <div class="product-item">
+                    <img src="{{ order_item.image_url }}" alt="Product" class="product-image">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">{{ order_item.product_name }}</div>
+                            
+                            {% if order_item.attributes != "{}" %}
+                                    {% for attribute, value in order_item.attributes.items %}
+                                    <div class="product-details">
+                                        <div class="product-detail-item">
+                                            <span>{{ attribute }} : {{ value }}</span>   
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+
+                        </div>
+                        <div class="product-pricing">
+                            <span class="product-quantity"><b>Quantity: {{ order_item.quantity }}<b></span>
+                            <span class="product-price">${{ order_item.unit_price }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            
+        </div>
+            
+        <div class="row">
+            <div class="col-lg-7">
+                <!-- Shipping Address -->
+                <div class="order-section">
+                    <h2 class="section-title">
+                        <i class="bi bi-geo-alt"></i>
+                        Shipping & Billing Information
+                    </h2>
+                    <div class="address-grid">
+                        
+                        <div class="address-card">
+                            <div class="address-title">
+                                <i class="bi bi-truck"></i>
+                                Shipping Address
+                            </div>
+                            <div class="address-content">
+                                <strong>{{ user.username }}</strong><br>
+                                {{ shipping_address.street_address }}<br>
+                                {{ shipping_address.city }}<br>
+                                {{ shipping_address.country }}<br>
+                                Phone : {{ user.userprofile.phone_number }}
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <!-- Tracking Timeline 
+                <div class="order-section">
+                    <h2 class="section-title">
+                        <i class="bi bi-clock-history"></i>
+                        Order Timeline
+                    </h2>
+                    <div class="tracking-timeline">
+                        <div class="timeline-item completed">
+                            <div class="timeline-content">
+                                <div class="timeline-date">Nov 15, 2024 - 2:30 PM</div>
+                                <div class="timeline-title">Order Placed</div>
+                                <div class="timeline-description">Your order has been received and confirmed</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item completed">
+                            <div class="timeline-content">
+                                <div class="timeline-date">Nov 15, 2024 - 4:15 PM</div>
+                                <div class="timeline-title">Payment Confirmed</div>
+                                <div class="timeline-description">Payment successfully processed</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item completed">
+                            <div class="timeline-content">
+                                <div class="timeline-date">Nov 16, 2024 - 9:00 AM</div>
+                                <div class="timeline-title">Processing</div>
+                                <div class="timeline-description">Items are being prepared for shipment</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item completed">
+                            <div class="timeline-content">
+                                <div class="timeline-date">Nov 17, 2024 - 11:30 AM</div>
+                                <div class="timeline-title">Shipped</div>
+                                <div class="timeline-description">Package handed to carrier - Tracking: TRK123456789</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item completed">
+                            <div class="timeline-content">
+                                <div class="timeline-date">Nov 20, 2024 - 3:45 PM</div>
+                                <div class="timeline-title">Delivered</div>
+                                <div class="timeline-description">Package successfully delivered to your address</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                -->
+
+            </div>
+
+            <div class="col-lg-5">
+                <!-- Order Summary -->
+                <div class="order-section">
+                    <h2 class="section-title">
+                        <i class="bi bi-receipt-cutoff"></i>
+                        Order Summary
+                    </h2>
+                    <div class="order-summary">
+                        <div class="summary-row">
+                            <span class="summary-label">Subtotal</span>
+                            <span class="summary-value">${{ order.subtotal }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Shipping</span>
+                            <span class="summary-value">${{ order.shipping_cost }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Tax (20%)</span>
+                            <span class="summary-value">${{ order.vat }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Discount</span>
+                            <span class="summary-value text-success">-${{ order.discount_amount | default:0.00}}</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span class="summary-label">Total</span>
+                            <span class="summary-value">${{ order.final_total }}</span>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-primary-action">
+                            <i class="bi bi-download"></i>
+                            Download Invoice
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Need Help -->
+                <div class="order-section" style="background: linear-gradient(135deg, #e7f3ff 0%, #cfe2ff 100%); border: 2px solid #0d6efd;">
+                    <h2 class="section-title">
+                        <i class="bi bi-question-circle"></i>
+                        Need Help?
+                    </h2>
+                    <p style="color: #495057; margin-bottom: 1rem;">Have questions about your order? Our support team is here to help!</p>
+                    <button class="btn-primary-action" style="width: 100%; justify-content: center;">
+                        <i class="bi bi-headset"></i>
+                        Contact Support
+                    </button>
+                </div>
+            </div>
+        </div>
+</div>
+
+{% endblock content %}

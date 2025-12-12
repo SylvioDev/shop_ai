@@ -18,8 +18,9 @@ class ServiceContainer:
         self._user_service = None
         self._login_service = None
         self._signup_service = None
+        # Order init
+        self._order_repo = None
         
-    
     # Checkout app
     @property
     def checkout_repo(self):
@@ -106,6 +107,16 @@ class ServiceContainer:
             from apps.users.services import LoginService
             self._login_service = LoginService(self.login_repo)
         return self._login_service
+    
+    # Order app
+    @property
+    def order_repo(self):
+        if self._order_repo is None:
+            from apps.orders.repositories import OrderRepository
+            self._order_repo = OrderRepository()
+        return self._order_repo
+    
+    
     
 container = ServiceContainer()
 
