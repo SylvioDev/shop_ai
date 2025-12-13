@@ -8,7 +8,6 @@ from .views import (
     cancel,
     PaymentConfirmView,
     payment_processing,
-    process_receipt
 )
 
 urlpatterns = [
@@ -20,5 +19,4 @@ urlpatterns = [
     path('webhook/stripe/', stripe_webhook, name='stripe_webhook'),
     path('success/', success, name='success'),
     path('cancel/', cancel, name='cancel'),
-    path('receipt/<order_id>', process_receipt, name='process-receipt')
 ]

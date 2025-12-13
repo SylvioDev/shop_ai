@@ -119,7 +119,7 @@ class StripePaymentService:
                 )
             return checkout_session
         except Exception as error:
-            return JsonResponse({'error': str(error)})
+            return 'An error occured while creating Stripe checkout session. '
     
     def payment_details(self, payment : Payment):
         """

@@ -166,9 +166,8 @@ class TestStripePaymentService:
             payment=payment_data
         )
     
-        assert response.status_code == 200
-        assert "error" in response.content.decode()
-    
+        assert response == 'An error occured while creating Stripe checkout session. '
+        
     def test_payment_details(self, payment_data):
         output = container.payment_service.payment_details(payment=payment_data)
         assert isinstance(output, dict)
