@@ -65,18 +65,20 @@ function addToCart(element){
         fetch(request)
         .then(response => response.json())
         .then(data => {
+
             
     
             if (data.status == "success"){
-                document.getElementById('cart-items').innerHTML = data.count;
+                const el = document.querySelectorAll("#cart-items")[0];
+                el.innerHTML = data['count'];
                 
-    
+                
             }
     
     
         })
         .catch(error => {
-    
+            console.log(`An error occured : ${error}`);
         })
     
     

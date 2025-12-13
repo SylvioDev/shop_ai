@@ -1,0 +1,117 @@
+{% extends 'checkout_base.html' %}
+
+{% block title %} Payment initiation {% endblock title %}
+
+{% block content %}
+<br>
+
+<div class="checkout-container" style="margin-top: 10px;">
+
+    <!-- Page header -->
+    <div class="page-header">
+        <h1><i class="bi bi-shield-lock"></i> Secure Payment</h1>
+        {% if count > 0 %}
+            <p>Your cart is valid</p>
+        {% endif %}
+    </div>
+
+    <div class="checkout-content">
+
+        <!-- Left card : Payment preparation message -->
+        <div class="checkout-form" style="text-align:center; padding-top: 40px; padding-bottom: 40px;">
+
+            <div class="section-title" style="justify-content:center;">
+                <i class="bi bi-shield-check"></i>
+                Payment Details
+            </div>
+
+            <p class="mb-4" style="font-size:1.05rem; color:#4a5568;">
+                You selected: <strong>{{ payment_method|default:"PayPal" }}</strong>
+            </p>
+
+            <p class="mb-4" style="font-size:1.2rem; font-weight:600;">
+                Total to charge: 
+                <span style="color:#667eea;">${{ total|floatformat:2 }}</span>
+            </p>
+
+            <!-- Spinner -->
+            <div style="margin-top: 5px; margin-bottom: 5px;">
+                <div class="spinner"></div>
+            </div>
+            
+            {% if count == 0 %}
+                <p> Your cart is empty. Please add items to your cart before proceeding to payment.</p>
+                <br>
+
+                <form method="post" id="payment-form">
+                    {% csrf_token %}
+                    <button id="stripe-button" class="btn btn-warning" disabled>
+                        <i class="text-white bi bi-credit-card"></i>
+                        <label id="stripe-button-label" class="text-white">Confirm & Pay</label>
+                    </button>
+                </form>
+
+            {% else %}
+                <p style="font-size:1.05rem; color:#4a5568;">
+                    Please click the button below to pay ...
+                <form method="post" id="payment-form">
+                    {% csrf_token %}
+                    <button id="stripe-button" class="btn btn-warning">
+                        <i class="text-white bi bi-credit-card"></i>
+                        <label id="stripe-button-label" class="text-white">Confirm & Pay</label>
+                    </button>
+                </form>
+
+                
+            {% endif %}
+
+        </div>
+
+        <!-- Right card : Short summary only -->
+        <div class="cart-summary">
+            <h3 class="summary-title">Order Summary</h3>
+
+            <div class="summary-line">
+                <span>Subtotal</span>
+                <span>${{ subtotal |floatformat:2 }}</span>
+            </div>
+
+            <div class="summary-line">
+                <span>VAT ({{ vat_rate }}%)</span>
+                <span>${{ vat_total |floatformat:2 }}</span>
+            </div>
+
+            <div class="summary-line">
+                <span>Shipping</span>
+                <span>${{ shipping_fee |floatformat:2 }}</span>
+            </div>
+
+            <div class="summary-line total">
+                <span>Total</span>
+                <span>${{ total |floatformat:2 }}</span>
+            </div>
+
+            
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Auto redirect after page loads
+    
+    stripeButton = document.getElementById('stripe-button');
+    stripeButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        stripeButton.disabled = true;
+        stripeButton.innerHTML = '<span class="spinner"></span> <label class="text-white">Redirecting to Stripe.com ...<label>';
+        setTimeout(() => {
+            document.getElementById('payment-form').submit();
+        }, 1000);            
+    });
+
+
+
+</script>
+
+{% endblock content %}

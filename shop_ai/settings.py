@@ -44,9 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.products',
     'apps.cart',
+    'apps.checkout',
+    'apps.orders',
     'crispy_forms',
     'crispy_bootstrap5',
-    'social_django'
+    'social_django',
 ]
 
 MIDDLEWARE = [
@@ -65,7 +67,7 @@ ROOT_URLCONF = 'shop_ai.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],
+        'DIRS': [BASE_DIR / "templates", BASE_DIR / "apps"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -189,3 +191,9 @@ EMAIL_HOST_USER = 'ratremarakoto@gmail.com'
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 CART_SESSION_ID = "cart"
+
+# STRIPE CREDENTIALS
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+STRIPE_PUB_KEY = os.getenv('STRIPE_PUB_KEY')
+STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
+DOMAIN_URL = 'http://localhost:8000/'

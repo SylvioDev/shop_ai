@@ -1,0 +1,76 @@
+{% extends 'order_base.html' %}
+
+{% block title %} <title> Order detail  </title>{% endblock title %}
+
+{% block content %}
+
+<div class="orders-header">
+        <div class="container">
+            <h1 class="mb-0"><i class="bi bi-box-seam me-2"></i>My Orders</h1>
+        </div>
+</div>
+
+    <div class="orders-container">
+        {% for order in orders %}
+            <!-- Order Card  -->
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-info">
+                        <div class="order-info-item">
+                            <span class="order-info-label">Order Number</span>
+                            <span class="order-info-value">{{ order.order_number }}</span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="order-info-label">Date</span>
+                            <span class="order-info-value">{{ order.created_at }}</span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="order-info-label">Status</span>
+                            <span class="status-badge status-completed">{{ order.status }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="order-body">
+
+                    <div class="order-summary-row">
+                        <span class="summary-label">
+                            <i class="bi bi-box-seam"></i>
+                            Items
+                        </span>
+                        <span class="summary-value">{{ order.items.count }} items</span>
+                    </div>
+
+                    <div class="order-summary-row">
+                        <span class="summary-label">
+                            <i class="bi bi-truck"></i>
+                            Shipping
+                        </span>
+                        <span class="summary-value">Standard Shipping</span>
+                    </div>
+                    <br>
+                
+                    <div class="order-footer">
+                        <div class="order-total">
+                            Total: ${{ order.final_total }}
+                        </div>
+                        <div class="order-actions">
+                            <a href="{% url 'order_detail' order.order_number %}" class="btn-view-details">
+                                <i class="bi bi-eye"></i>
+                                View Details
+                            </a>
+                            <!--
+                            <button class="btn-download">
+                                <i class="bi bi-download"></i>
+                                Download Invoice
+                            </button>
+                            -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        {% endfor %}
+
+    </div>
+
+{% endblock content %}

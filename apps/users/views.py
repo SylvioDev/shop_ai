@@ -1,12 +1,13 @@
-import os
 import uuid
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic import UpdateView
 from django.contrib.auth.views import PasswordResetView
-from .forms import SignupForm
-from .forms import LoginForm
-from .forms import VerifyPasswordForm
+from .forms import (
+    SignupForm,
+    LoginForm,
+    VerifyPasswordForm
+)
 from django.shortcuts import render, redirect
 from django.contrib.auth import login as auth_login, get_backends
 from django.contrib.auth import logout as auth_logout
@@ -25,12 +26,10 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from .models import PendingEmailChange, UserProfile
 from django.conf import settings 
 from django.urls import reverse
-from django.contrib.auth.views import PasswordResetConfirmView
 from django.http import HttpResponse
-from .services import SignupService
-from .services import LoginService
 from django.utils.http import urlsafe_base64_decode
 from django.core.mail import send_mail
+from apps.container import container
 
 def activate_account(request, uidb64, token):
     """
@@ -108,12 +107,13 @@ class LoginView(FormView):
         """
         form = self.form_class(request.POST)
         if form.is_valid():
-            obj_user = LoginService().valid_user(form_data=form.cleaned_data)
+            obj_user = container.login_service.valid_user(form_data=form.cleaned_data)
             if obj_user.get('user'):
                 auth_login(self.request, obj_user.get('user'))
-                return redirect(self.success_url)
+                next_url = request.POST.get('next') or request.GET.get('next') or self.success_url
+                return redirect(next_url)
             else:
-                error = LoginService().valid_user(form.cleaned_data).get('error')
+                error = container.login_service.valid_user(form.cleaned_data).get('error')
                 return render(self.request, self.template_name, {'form' : form, 'error':error})
         
         return render(self.request, self.template_name, {'form' : form})
@@ -152,7 +152,7 @@ class SignupView(FormView):
         form = self.form_class(request.POST)
         if form.is_valid():
             domain = get_current_site(request).domain
-            new_user = SignupService().signup_user(domain, form.cleaned_data)
+            new_user = container.signup_service.signup_user(domain, form.cleaned_data)
             return render(request, 'check_email.html', {'user' : new_user})
         return render(request, self.template_name, {'form' : form})
 
@@ -396,15 +396,17 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         last_name = request.POST.get('last_name')
         profile_picture = request.FILES['profile-pic'] if request.FILES else None
         facebook_username = request.POST.get('facebook')
+        phone_number = request.POST.get('phone-number')
         user.username = username
-        user.userprofile.social_media_username = facebook_username
         user.first_name = first_name
         user.last_name = last_name
+        user.userprofile.social_media_username = facebook_username
+        user.userprofile.phone_number = phone_number
         if profile_picture:
-            save_path = os.path.join(settings.MEDIA_ROOT, f'profile_pics\\user_{user.id}\\{profile_picture.name}')
-            with open(save_path, 'wb') as output_file:
-                for chunk in profile_picture.chunks():
-                    output_file.write(chunk)
-            user.userprofile.profile_picture = f'profile_pics/user_{user.id}/{profile_picture.name}'
+            user.userprofile.profile_picture.save(profile_picture.name, profile_picture)
+            user.userprofile.save()
+        
         user.save()
+
+
         return redirect('profile')

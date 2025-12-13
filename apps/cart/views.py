@@ -42,7 +42,7 @@ def add_to_cart(request : HttpRequest, product_sku : str, product_quantity : int
     
     message = str(cart.add(product_sku, product_quantity))
     status = "error" if "Product with SKU" in message else "success"
-    
+
     if status == 'success':
         return JsonResponse(
             {
@@ -66,12 +66,11 @@ def cart_detail(request : HttpRequest):
     Returns:
         JsonResponse (dict) : 
             - cart : cart attribute
-            - count : number of distinc items inside the cart
+            - count : number of distincts items inside the cart
             - cart_summary : cart'summary
         
     """
     cart = Cart.from_request(request)
-    print(cart.get_cart_summary())
     return render(
         request, 
         'cart.html', 
@@ -109,12 +108,12 @@ def update_quantity(request : HttpRequest, product_sku : str, product_quantity :
             'message' : f'Quantity of "{product_sku} updated successfully',
             'cart_summary' : cart_summary,
             'cart' : cart.cart
-        })
+        }, status=200)
     else:
         return JsonResponse({
             "status" : "error",
             "message" : f"product '{product_sku}' doesn't exist"
-        })    
+        }, status=400)    
 
 def delete_product(request : HttpRequest, product_sku : str) -> dict:
     """

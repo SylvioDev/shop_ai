@@ -70,7 +70,6 @@ class TestCartAddView:
         assert cart.get(sku) is not None
         assert cart.get(sku)['quantity'] == 5
         
-
 class TestCartUpdateQuantityView:
     def test_cart_update_quantity_failure(self, client, variant_sku, variant_product):
         invalid_sku = 'Invalid sku'

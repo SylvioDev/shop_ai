@@ -12,8 +12,13 @@ from apps.factories import \
     CategoryFactory
 )
 from django.conf import settings
+from django.contrib.auth.models import User
+from apps.users.models import Address
+from apps.cart.cart import Cart
 import tempfile
 import shutil
+from django.urls import reverse
+from apps.container import container
 
 pytestmark = pytest.mark.django_db
 
@@ -96,3 +101,105 @@ def variant_product(variant_sku):
     variant_product.save()
 
     return variant_product
+
+@pytest.fixture
+def mock_session(cart_data, order_data, payment_data):
+    checkout_session = container.payment_service.create_session(
+        cart=cart_data,
+        user=order_data.customer_id,
+        order=order_data,
+        payment=payment_data
+    )
+    return checkout_session
+
+@pytest.fixture
+def valid_user():
+    user = User.objects.create_user(
+        username='test',
+        email='test@example.com',
+        password='mypassword'
+    )
+    user.save()
+    address = Address.objects.create(
+        user=user,
+        address_type='shipping',
+        city='Bruxelles',
+        state = 'Bruxelles',
+        country = 'Switzerland',
+        zip_code = 70028,
+        street_address='Hans Meier Gerechtigkeistgasse 10 3011 Berne'
+    )
+    address.save()
+    return user
+
+def checkout_user(username, user_address):
+    user = User.objects.create_user(
+        username=username,
+        email=f'{username}@example.com',
+        password='password'
+    )
+    address = Address.objects.create(
+        user=user,
+        address_type='shipping',
+        city='New York',
+        state = 'New York',
+        country = 'US',
+        zip_code = 10028,
+        street_address=user_address
+    )
+    return user
+
+#### Checkout app fixtures ####
+
+@pytest.fixture
+def cart_data(sku, variant_sku, product, variant_product):
+    cart = Cart({})
+    cart.add(sku, quantity=4)
+    cart.add(variant_sku, quantity=2)
+    return cart
+
+@pytest.fixture
+def payment_process_cart(client, sku, variant_sku, product, variant_product):
+    params = {
+        'product_sku' : sku,
+        'product_quantity' : 4
+    }
+    variant_params = {
+        'product_sku': variant_sku,
+        'product_quantity' : 5
+    }
+    cart_add = client.post(reverse('cart-add', kwargs=params))
+    another_cart_add = client.post(reverse('cart-add', kwargs=variant_params))
+    
+@pytest.fixture
+def cart_summary_test(cart_data):
+    return cart_data.get_cart_summary()
+
+@pytest.fixture
+def total_amount_test(cart_summary_test):
+    output = cart_summary_test.get('subtotal_price') + cart_summary_test.get('taxes') + cart_summary_test.get('shipping_fee')
+    return output
+
+def user_order(cart_data, username, user_address):
+    cart_summary = cart_data.get_cart_summary()
+    total_amount = cart_summary.get('subtotal_price') + cart_summary.get('taxes') + cart_summary.get('shipping_fee')
+    order = container.checkout_repo.create_order(
+        user=checkout_user(username=username, user_address=user_address),
+        cart_data=cart_summary,
+        total_amount=total_amount
+    )
+    return order    
+
+@pytest.fixture
+def order_data(cart_data):
+    order = user_order(cart_data, 'Paul', '78th street')
+    return order
+
+@pytest.fixture
+def payment_data(cart_data, order_data):
+    payment = container.checkout_repo.create_payment(
+        order=order_data,
+        payment_provider='Stripe',
+        amount=cart_data.get_cart_summary()['total_price']
+    )
+    return payment

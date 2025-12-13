@@ -1,3 +1,4 @@
+from apps.container import container
 import pytest 
 import factory
 from apps.cart.cart import Cart 
@@ -12,8 +13,6 @@ from apps.factories import \
     VariantAttributeFactory,
     CategoryFactory
 )
-
-from apps.products.repositories import ProductRepository
 
 pytestmark = pytest.mark.django_db
 
@@ -34,7 +33,6 @@ def mock_session():
 def cart(mock_session):
     cart = Cart(mock_session)
     return cart
-
 
 class TestCart:
     def test_cart_initialization(self, mock_session):
@@ -75,7 +73,7 @@ class TestCart:
         assert cart.modified == True
 
     def test_cart_variant_product_with_attributes(self, variant_sku, cart, variant_product):
-        variant_attributes = ProductRepository().get_variant_attribute(variant_product.id)
+        variant_attributes = container._product_repo.get_variant_attribute(variant_product.id)
         assert variant_attributes is not {}
         assert variant_product.sku == variant_sku
         cart.add(variant_product.sku, quantity=7)

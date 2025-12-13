@@ -1,6 +1,5 @@
+from apps.container import container
 from shop_ai.settings import CART_SESSION_ID 
-from apps.products.repositories import ProductRepository
-
 class Cart:
     """
     Represents a cart in the system.
@@ -91,14 +90,14 @@ class Cart:
             }, 
         
         """
-
+        
         try:
-            product_dict = ProductRepository().get_by_sku(product_sku)
+            product_dict = container.product_repo.get_by_sku(product_sku)
         except ValueError as error:
             return error 
         
         product = product_dict['product']
-        attributes = ProductRepository().get_variant_attribute(product)
+        attributes = container.product_repo.get_variant_attribute(product)
         quantity = int(quantity)
         
         if product.sku not in self.cart:
@@ -109,7 +108,7 @@ class Cart:
                 'price' : float(product.price),
                 'old_price' : float(product.old_price),
                 'stock' : int(product.stock),
-                'image' : ProductRepository().get_product_image(product.sku),
+                'image' : container.product_repo.get_product_image(product.sku),
                 'quantity' : quantity if quantity > 0 else 1
             }
         else:
@@ -185,7 +184,7 @@ class Cart:
             taxes (float) attribute 
 
         """
-        self.taxes = self.subtotal - (self.subtotal * 20) / 100
+        self.taxes = (self.subtotal * 20) / 100
         return self.taxes
     
     def set_total_items(self):

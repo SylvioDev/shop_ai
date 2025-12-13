@@ -572,7 +572,7 @@
 
                             <div class="quantity-controls">
                                 <button class="qty-btn" onclick="DecreaseQuantity(this)">−</button>
-                                <input  type="number" class="quantity" min="1" max="{{ product.stock }}" id="qty-1" value="{{ product.quantity }}"></span>
+                                <input style="-webkit-appearance:none;border:none;background:none" type="number" class="quantity" min="1" max="{{ product.stock }}" id="qty-1" value="{{ product.quantity }}" disabled></span>
                                 <button class="qty-btn" onclick="IncreaseQuantity(this)">+</button>
                             </div>
                         </div>
@@ -596,33 +596,21 @@
                 
                 <div class="summary-line">
                     
-                    <span id="subtotal-items">Subtotal ({{ cart_summary.total_items }}) units </span>
-                    <span id="subtotal-price">${{ cart_summary.subtotal_price }}</span>
+                    <span id="subtotal-items">Subtotal ({{ cart_summary.total_items}}) units </span>
+                    <span id="subtotal-price">${{ cart_summary.subtotal_price|floatformat:2 }}</span>
                 </div>
-                
-                <div class="summary-line discount">
-                    <span>VAT (20%)</span>
-                    <span id="vat">+${{ cart_summary.taxes }}</span>
-                </div>
-                
-                <div class="summary-line">
-                    <span>Shipping Fee</span>
-                    <span id="shipping">${{ cart_summary.shipping_fee }}</span>
-                </div>
-                
-                <div class="summary-line total">
-                    <span>Total</span>
-                    <span id="final-total">${{ cart_summary.total_price }}</span>
-                </div>
-
+            
                 <div class="cart-actions">
                     <button class="btn btn-primary pulse" onclick="proceedToCheckout()">
-                        Proceed to Checkout
+                        Proceed to Checkout 
+                        <!-- Shopping Cart with Checkmark Icon -->
+
                     </button>
                     <a href="{% url 'products' %}" class="btn btn-secondary" onclick="continueShopping()">
                         Continue Shopping
                     </a>
                 </div>
+            
             </div>
         </div>
     </div>

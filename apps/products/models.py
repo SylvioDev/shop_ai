@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from django.conf import settings
 import uuid 
 
 def product_image_path(instance, filename):
@@ -58,7 +59,7 @@ class Product(models.Model):
         if not self.sku:
             self.sku = f'SKU-{uuid.uuid1().hex[:8].upper()}'
 
-        self.discount = 100 - (self.price * 100) / self.old_price if self.old_price > 0 else 0.0
+        self.discount = 100 - (self.price * 100) / self.old_price if self.old_price > 0 else 0.0        
         super().save(force_insert=force_insert, *args, **kwargs)
 
     def __str__(self):

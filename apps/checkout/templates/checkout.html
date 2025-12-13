@@ -1,0 +1,160 @@
+{% extends "checkout_base.html" %}
+
+{% block content %}
+<br>
+<div class="checkout-container">
+    <div class="page-header">
+        <h1><i class="bi bi-cart"></i> Cart review </h1>
+        <p>Review your credentials and cart items before checkout</p>
+    </div>
+
+    <div class="checkout-content">
+        <!-- Formulaire de paiement -->
+        <div class="checkout-form">
+            <form id="checkoutForm">
+                <!-- Shipping Information -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="bi bi-truck"></i>
+                        Shipping Information
+                    </h3>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name </label>
+                            <input type="text" class="form-control" id="firstName" value = "{{ user.first_name }}" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name </label>
+                            <input type="text" class="form-control" id="lastName" value = "{{ user.last_name }}"disabled>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Email Address </label>
+                            <input type="email" class="form-control" id="email" value = "{{ user.email }}" disabled>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Phone Number </label>
+                            <input type="tel" class="form-control" id="phone" value = "{{ user.userprofile.phone_number }}" disabled>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Street Address </label>
+                            <input type="text" class="form-control" id="address" value = "{{ user_address.street_address }}" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">City </label>
+                            <input type="text" class="form-control" id="city" value="{{ user_address.city }}" disabled>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">State </label>
+                            <input type="text" class="form-control" id="state" value="{{ user_address.state }}" disabled>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">ZIP Code </label>
+                            <input type="text" class="form-control" id="zip" value="{{ user_address.zip_code }}" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="bi bi-credit-card"></i>
+                        Payment Method
+                    </h3>
+                    
+                    <div class="payment-methods">
+                        <div class="payment-method" id="payment-meth" data-method="paypal">
+                            <i class="bi bi-stripe"></i>
+                            <span>Stripe</span>
+                        </div>
+                        
+                    </div>
+
+                    <br>
+                    <label>
+                        Want to change it ? Go to
+                        <a href="{% url 'edit-profile'%}">
+                            Edit profile page
+                        </a>
+                    </label>
+                    
+                </div>
+
+                <button type="submit" class="btn-place-order">
+                    <i class="bi bi-check-fill"></i> Check cart
+                </button>
+            </form>
+        </div>
+
+        <!-- Order Summary (Cart) -->
+        <div class="cart-summary">
+            <h2 class="summary-title">Order Summary</h2>
+            
+            <div class="cart-items-list" id="cartItemsList">
+                <!-- Items du panier (dynamique depuis Django) -->
+                {% for key, product in cart.items %}
+                <div class="summary-item">
+                    <img src="{{ product.image }}" alt="{{ product.title }}" class="summary-item-img">
+                    <div class="summary-item-details">
+                        <div class="summary-item-title">{{ product.title }}</div>
+                        <div class="summary-item-qty">
+                            {% if product.attributes %}
+                                {% for key, attr in product.attributes.items %}
+                                     {{ key }} : {{ attr }} 
+                                     <br>
+                                {% endfor %}
+                                <br>
+                            {% endif %}
+                            
+                            Quantity: <b>{{ product.quantity }}</b>
+                            
+                        </div>
+                    </div>
+                    <div class="summary-item-price">${{ product.price }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="summary-line">
+                <span>Subtotal ({{ cart_summary.total_items }} units)</span>
+                <span id="subtotal">${{ cart_summary.subtotal_price|floatformat:2 }}</span>
+            </div>
+            
+            <div class="summary-line">
+                <span>VAT (20%)</span>
+                <span id="vat">${{ cart_summary.taxes|floatformat:2 }}</span>
+            </div>
+            
+            <div class="summary-line">
+                <span>Shipping Fee</span>
+                <span id="shipping">${{ cart_summary.shipping_fee|floatformat:2 }}</span>
+            </div>
+            
+            <div class="summary-line total">
+                <span>Total</span>
+                <span id="total">${{ cart_summary.total_price|floatformat:2 }}</span>
+            </div>
+            <br>
+            <a class="text-dark text-decoration-none" href="{% url 'cart' %}"><i class="bi bi-arrow-left-square-fill"></i> Modify cart</a>
+        </div>
+    </div>
+</div>
+
+<!-- Success/Error Modal -->
+<div class="modal-overlay" id="resultModal">
+    <div class="modal-content">
+        <div class="modal-icon success" id="modalIcon">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <h2 class="modal-title" id="modalTitle">Payment Successful!</h2>
+        <p class="modal-message" id="modalMessage">
+            Your shopping card is valid.
+        </p>
+        <div class="modal-order-number" id="orderNumber">
+            
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}
+

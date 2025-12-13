@@ -16,6 +16,105 @@
 
 <!-- Navbar -->
 
+<nav class="navbar  navbar-expand-lg navbar-light bg-white px-8 py-3 shadow-sm fixed-top">
+  <div class="container-fluid">
+    <!-- Brand -->
+    
+    <!-- Search bar -->
+    <form class="d-flex flex-grow-1 me-3" role="search">
+      <a class="navbar-brand" href="{% url 'products' %}">
+        <small>SHOP AI</small>
+      </a>
+         
+  
+      <input class="form-control me-3" id="search-bar" style="border-radius:50px" type="search" placeholder="Search products ..." aria-label="Search">
+      <button class="btn btn-warning" style="color:white" type="submit"><i class="bi bi-search"></i></button>
+    
+    </form>
+
+    <div class="ms-auto d-flex align-items-center mt-3 mt-lg-0" id="cart-container">
+      {% if not user.is_authenticated %}
+          <a href="{% url 'login' %}" class="me-3 text-dark text-decoration-none"><i class="bi bi-box-arrow-right"></i> Log in</a>
+      {% endif %}
+
+      <a href="{% url 'cart' %}" class="position-relative me-3">
+        <i class="bi bi-cart fs-4 text-dark"></i>
+        <span id="cart-items" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
+          {{ count }}
+          <span class="visually-hidden"></span>
+        </span>
+      </a>
+      
+      
+      
+      {% if user.is_authenticated %}
+     
+          <!-- Profil avec dropdown -->
+
+          <div class="dropdown">
+            {% if user.userprofile.profile_picture %}
+            <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" class="profile-pic" data-bs-toggle="dropdown" aria-expanded="false" />
+            {% else %}
+            <img 
+                src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.PKlD9uuBX0m4S8cViqXZHAHaHa%3Fr%3D0%26pid%3DApi&f=1&ipt=d21b0bf7247a83a119e6d7e81a158c7613ca0d57822822d896676e1e229758ba&ipo=images"
+                alt="Profile Picture" 
+                class="profile-pic" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false" 
+            />
+            {% endif %}
+
+            <ul class="dropdown-menu dropdown-menu-end custom-dropdown">
+              
+              <li>
+                <a class="dropdown-item" href="#">
+                  Hi {{user.username}}
+                </a>
+              </li>
+              
+              <li>
+                <a class="dropdown-item" href="{% url 'profile' %}">
+                  <span class="icon-wrapper bg-warning text-white"><i class="bi bi-person-fill"></i></span>
+                  Profile
+                </a>
+              </li>
+              
+              <li>
+                  <a class="dropdown-item" href="{% url 'orders' %}">
+                      <span class="icon-wrapper bg-info text-white"><i class="bi bi-box-seam"></i></span>
+                      My Orders
+                  </a>
+              </li>
+              
+
+              <li><hr class="dropdown-divider" /></li>
+              
+              <li>
+                <a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                  <span class="icon-wrapper bg-danger text-white"><i class="bi bi-power"></i></span>
+                  Log out
+                </a>
+              </li>
+
+            </ul>
+          </div>
+          
+
+          
+      {% endif %}
+
+
+    </div>
+
+
+   
+    
+  </div>
+</nav>
+
+
+<!-- Navbar -->
+
 {% block content %}
 
 {% endblock content %}
