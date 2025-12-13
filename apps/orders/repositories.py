@@ -1,9 +1,6 @@
 from django.contrib.auth.models import User
-from apps.checkout.models import (
-    Order,
-    OrderItem
-)
-
+from apps.orders.models import Order
+from apps.orders.models import OrderItem
 class OrderRepository:
     def retrieve_user_orders(self, user : User):
         return Order.objects.filter(customer_id=user)

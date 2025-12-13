@@ -1,6 +1,5 @@
 import pytest
 import factory
-import uuid
 from apps.factories import \
 (
     ProductFactory,

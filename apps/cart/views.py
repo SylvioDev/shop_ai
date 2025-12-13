@@ -42,7 +42,7 @@ def add_to_cart(request : HttpRequest, product_sku : str, product_quantity : int
     
     message = str(cart.add(product_sku, product_quantity))
     status = "error" if "Product with SKU" in message else "success"
-    
+
     if status == 'success':
         return JsonResponse(
             {

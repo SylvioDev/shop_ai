@@ -13,7 +13,8 @@ from apps.checkout.cart_validation.cart_exceptions import (
     EmptyCartError,
     OutOfStockError
 )
-from apps.checkout.models import Payment, OrderItem
+from apps.checkout.models import Payment
+from apps.orders.models import OrderItem
 from unittest.mock import MagicMock
 from datetime import datetime, timezone
 

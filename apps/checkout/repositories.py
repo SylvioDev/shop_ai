@@ -1,9 +1,7 @@
 from apps.container import container
-from .models import (
-    Order,
-    OrderItem,
-    Payment
-)
+from .models import Payment
+from apps.orders.models import Order
+from apps.orders.models import OrderItem
 from apps.products.models import (
     Product,
     ProductVariant

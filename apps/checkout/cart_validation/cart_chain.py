@@ -3,7 +3,6 @@ from .cart_handlers import (
     EmptyCartHandler,
     OutOfStockHandler
 )
-
 class CartValidationChain:
     """
     Orchestrates cart validation handlers.
