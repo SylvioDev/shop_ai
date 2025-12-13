@@ -12,28 +12,26 @@ Products App: Product catalog, detail views, and dynamic listings
 
 Cart App: Cart logic with add/remove/update functionality
 
+Orders App : Order creation, management, and tracking
+
 Test Suite: > 90 % coverage using pytest, integrated with GitHub Actions
 
 Environment Management: Secure .env handling with django-environ
 
 🧩 Planned Enhancements
 
-Checkout System: Order creation, payment flow, and transaction management
-
-FastAPI Service: Lightweight API layer for async operations (e.g., recommendations, AI-driven endpoints)
+RestAPI Service : API endpoints using DRF (Django Rest Framework)
 
 Chatbot Assistant (Optional): AI-powered shopping assistant using NLP models
 
-Docker & CI/CD Pipeline: Production-ready deployment workflow
-
 🛠️ Tech Stack
 
-Backend: Django 5 , FastAPI (planned)
+Backend: Django 5 , DJANGO REST FRAMEWORK
 
 Database: PostgreSQL (configurable via .env)
 
 Testing: Pytest, GitHub Actions CI
 
 Auth: Django’s built-in system with extensible models
+Environment: python-dotenv, django-environ
 
-AI Integration (future): OpenAI or Hugging Face APIs
