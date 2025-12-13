@@ -42,3 +42,21 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         }
         
         return render(request, self.template_name, context)
+
+#### Receipt view ####
+
+def process_receipt(request, order_id : str):
+    """
+    Handle receipt processing and rendering.
+    Retrieve the necessary context for the receipt and render the receipt template.
+    
+    Args:
+        request: The HTTP request object.
+        order_id (str): The identifier of the order for which to generate the receipt.
+    """
+    context = container.order_service.processing_receipt(order_id)
+    return render(
+        request,
+        'receipt.html',
+        context=context
+    )

@@ -62,7 +62,7 @@ class UserRepository:
         """
         Retrieve user instance by ID.
         """
-        return User.objects.filter(id=user_id)
+        return User.objects.filter(id=user_id).first()
 
     def retrieve_adress(self, user_instance : User):
         """

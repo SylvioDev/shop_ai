@@ -74,23 +74,21 @@ def payment_processing(request):
         
     """ 
     cart = Cart.from_request(request)
-    try:
-        # Order and payment initialization
-        order = container.checkout_service.order_creation(cart, request.user)
-        payment = container.checkout_service.payment_creation(order=order, payment_provider="stripe")
-        checkout_session = container.payment_service.create_session(cart, request.user, order, payment)
-        payment.stripe_payment_intent_id = checkout_session.payment_intent
-        payment.stripe_session_id = checkout_session.id
-        payment.save()
-        order.final_total = checkout_session.amount_total / 100
-        order.save()
-        container.checkout_service.add_order_items(order, cart=cart.cart)
-    except ValueError as error:
-        return JsonResponse({'status':'error', 'error': str(error)}, status=400)
+    # Order and payment initialization
+    order = container.checkout_service.order_creation(cart, request.user)
+    payment = container.checkout_service.payment_creation(order=order, payment_provider="stripe")
+    checkout_session = container.payment_service.create_session(cart, request.user, order, payment)
     
-    """if 'error' in checkout_session:
-        return JsonResponse({'status':'error', 'error': checkout_session.get('error')}, status=500)
-    """
+    if isinstance(checkout_session, str):
+        return JsonResponse({'status':'error', 'error': checkout_session}, status=400)
+    
+    payment.stripe_payment_intent_id = checkout_session.payment_intent
+    payment.stripe_session_id = checkout_session.id
+    payment.save()
+    order.final_total = checkout_session.amount_total / 100
+    order.save()
+    container.checkout_service.add_order_items(order, cart=cart.cart)
+
     return redirect(checkout_session.url, code=303)
     
 @csrf_exempt
@@ -215,26 +213,3 @@ class PaymentConfirmView(DetailView):
         """
         return redirect('create-checkout-session')
     
-#### Receipt view ####
-
-def process_receipt(request, order_id : str):
-    from apps.container import container
-    order = Order.objects.get(order_number=order_id)
-    user = User.objects.get(id=order.customer_id.id)
-    full_name = user.first_name + ' ' + user.last_name
-    shipping_address = container.user_service.get_user_address(user)
-    order_items = OrderItem.objects.filter(order=order)
-    context = {
-        'order_id' : order_id,
-        'order' : order,
-        'user' : user,
-        'full_name' : full_name,
-        'shipping_address' : shipping_address.street_address,
-        'order_items':order_items
-    }
-    
-    return render(
-        request,
-        'receipt.html',
-        context=context
-    )

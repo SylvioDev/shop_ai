@@ -147,7 +147,7 @@ class UserService:
     def __init__(self, user_repo):
         self.repository = user_repo
         
-    def get_user_credentials(self, user_id : int):
+    def get_user_credentials(self, user_id : int) -> User:
         """
         Retrieve user credentials by user ID.
         

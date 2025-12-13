@@ -20,7 +20,7 @@ class ServiceContainer:
         self._signup_service = None
         # Order init
         self._order_repo = None
-        
+        self._order_service = None
     # Checkout app
     @property
     def checkout_repo(self):
@@ -116,28 +116,12 @@ class ServiceContainer:
             self._order_repo = OrderRepository()
         return self._order_repo
     
-    
-    
+    @property
+    def order_service(self):
+        if self._order_service is None:
+            from apps.orders.services import OrderService
+            self._order_service = OrderService(self.order_repo)
+        return self._order_service
+        
 container = ServiceContainer()
 
-"""
-# Checkout app 
-        self._checkout_repo = CheckoutRepository()
-        self._checkout_service = CheckoutService(self._checkout_repo)
-        self._payment_service = StripePaymentService(self._checkout_repo)
-        self.card_validation = CartValidationChain()
-
-        # Product app
-        self.product_repo = ProductRepository()
-        self.product_service = ProductService(self.product_repo)
-        
-        # Users app
-        self.user_repo = UserRepository()
-        self.signup_repo = SignupRepository()
-        self.login_repo = LoginRepository()
-        # services
-        self.user_service = UserService(self.user_repo)
-        self.signup_service = SignupService(self.signup_repo)
-        sself.login_service = LoginService(self.login_repo)
-        
-"""
