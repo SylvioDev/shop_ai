@@ -1,2 +1,7 @@
 secrets/
 shop_ai/.env
+.env
+__pycache__/
+*.pyc
+.DS_Store
+.vscode/
