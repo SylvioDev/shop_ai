@@ -153,9 +153,9 @@ def fake_session(cart_session):
 class TestPaymentProcessingView:
     def test_payment_empty_cart(self, client, valid_user):
         login_response = client.post(reverse('login'), data={'identifier':'test', 'password':'mypassword', 'next':reverse('create-checkout-session')})
-        response = client.get(reverse('create-checkout-session'))
-        error_message = json.loads(response.content.decode()).get('error')
-        assert error_message == 'Cart is empty. Cannot create checkout session.'
+        with pytest.raises(ValueError) as exc_info:
+            response = client.get(reverse('create-checkout-session'))
+        assert 'Cart is empty. Cannot create checkout session.' == str(exc_info.value)
     
     def test_payment_success(self, mocker ,client, cart_session, valid_user, fake_session):
         client.force_login(valid_user)        
