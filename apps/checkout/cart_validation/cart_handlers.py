@@ -1,5 +1,5 @@
+from apps.container import container
 from apps.cart.cart import Cart
-from apps.products.repositories import ProductRepository
 from apps.checkout.cart_validation.cart_exceptions import (
     EmptyCartError,
     OutOfStockError
@@ -27,7 +27,7 @@ class OutOfStockHandler(BaseHandler):
         for key, value in cart.cart.items():
             product_quantity = value.get('quantity')
             product_sku = value.get('sku')
-            product_dict = ProductRepository().get_by_sku(product_sku)
+            product_dict = container.product_repo.get_by_sku(product_sku)
             product = product_dict.get('product')
             
             if int(product_quantity) > product.stock:

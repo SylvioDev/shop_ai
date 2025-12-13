@@ -8,10 +8,8 @@ from .custom_exceptions import (
     InvalidSignatureException
 )
 import logging
-from .models import (
-    Order,
-    Payment
-)
+from .models import Payment
+from apps.orders.models import Order
 
 logger = logging.getLogger(__name__)
 

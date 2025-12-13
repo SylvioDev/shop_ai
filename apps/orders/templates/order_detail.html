@@ -180,10 +180,12 @@
                             <span class="summary-label">Tax (20%)</span>
                             <span class="summary-value">${{ order.vat }}</span>
                         </div>
-                        <div class="summary-row">
-                            <span class="summary-label">Discount</span>
-                            <span class="summary-value text-success">-${{ order.discount_amount | default:0.00}}</span>
-                        </div>
+                        {%if order.discount_amount > 0 %}
+                            <div class="summary-row">
+                                <span class="summary-label">Discount</span>
+                                <span class="summary-value text-success">-${{ order.discount_amount | default:0.00}}</span>
+                            </div>
+                        {% endif %}
                         <div class="summary-row total">
                             <span class="summary-label">Total</span>
                             <span class="summary-value">${{ order.final_total }}</span>

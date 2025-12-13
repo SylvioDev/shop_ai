@@ -18,7 +18,9 @@ from apps.conftest import (
 )
 import json
 from apps.cart.cart import Cart
-from apps.checkout.models import Order, Payment, OrderItem
+from apps.checkout.models import Payment
+from apps.orders.models import Order
+from apps.orders.models import OrderItem
 from apps.checkout.custom_exceptions import (
     InvalidPayloadException,
     InvalidSignatureException

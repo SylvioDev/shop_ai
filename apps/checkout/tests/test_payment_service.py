@@ -19,7 +19,6 @@ from apps.checkout.custom_exceptions import (
 from apps.checkout.payment_service import StripePaymentService
 from apps.checkout.repositories import CheckoutRepository
 
-
 @pytest.fixture
 def fake_secret():
     return 'c51a0d81b4f3e67c92a84f3d1e67c92a84f3d1e67c92a84f3d1e67c92'

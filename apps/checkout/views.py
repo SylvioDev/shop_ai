@@ -19,11 +19,9 @@ from .custom_exceptions import (
     InvalidPayloadException,
     InvalidSignatureException,
 )
-from .models import (
-    OrderItem,
-    Order
-)
 from apps.container import container
+from apps.orders.models import Order
+from apps.orders.models import OrderItem
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 

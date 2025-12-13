@@ -12,7 +12,7 @@ from apps.conftest import (
     user_order
 )
 from apps.cart.cart import Cart
-from apps.checkout.models import Order
+from apps.orders.models import Order
 from apps.users.models import User
 from apps.checkout.models import Payment
 from apps.products.models import Product, ProductVariant
