@@ -96,7 +96,7 @@ class LoginView(FormView):
     def get(self, request):
         """ Display the login page with LoginForm """
         form = self.form_class()
-        print(os.getenv('DATABASE_URL'))
+        
         return render(request, self.template_name, {'form' : form})
     
     def post(self, request):

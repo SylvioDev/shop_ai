@@ -95,6 +95,9 @@ DATABASES = {
         'PASSWORD': os.environ.get('PGPASSWORD'),
         'HOST': os.environ.get('PGHOST'),  # Railway will override this
         'PORT': os.environ.get('PGPORT'),
+        "OPTIONS": {
+            "sslmode": "require",
+        },
     }
 }
 
