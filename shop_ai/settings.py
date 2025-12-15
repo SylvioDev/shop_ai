@@ -179,7 +179,7 @@ SOCIAL_AUTH_PIPELINE = (
 )
 
 
-# MEDIA_URL = "/media/"
+MEDIA_URL = "/media/"
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Email-backend
