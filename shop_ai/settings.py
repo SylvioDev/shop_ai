@@ -194,7 +194,7 @@ CART_SESSION_ID = "cart"
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_PUB_KEY = os.getenv('STRIPE_PUB_KEY')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
-DOMAIN_URL = 'http://localhost:8000/'
+DOMAIN_URL = 'https://shopai-production-fac8.up.railway.app/'
 
 # settings.py
 
