@@ -58,3 +58,5 @@ apps/users/tests/__pycache__/test_services.cpython-313-pytest-9.0.1.pyc
 apps/users/tests/__pycache__/test_views.cpython-313-pytest-9.0.1.pyc
 shop_ai/__pycache__/settings.cpython-313.pyc
 shop_ai/__pycache__/urls.cpython-313.pyc
+shopai-env/
+.dockerignore
