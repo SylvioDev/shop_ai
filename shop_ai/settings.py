@@ -16,6 +16,17 @@ from dotenv import load_dotenv
 import cloudinary.api
 import cloudinary.uploader
 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+import os
+
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+)
+
 load_dotenv() # Load environment variables from .env files
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -132,11 +143,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-"""
+
 STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
-"""
+
 STATIC_ROOT = BASE_DIR / "static"
 
 # Default primary key field type
