@@ -110,7 +110,7 @@ class ProductVariant(models.Model):
         return f"{self.identifiant}"
 
 class VariantImage(models.Model):
-    variant = models.ForeignKey(ProductVariant, related_name='variant_image', on_delete=models.Case)
+    variant = models.ForeignKey(ProductVariant, related_name='variant_image', on_delete=models.CASCADE)
     image = models.ImageField(upload_to=variant_product_image_path)
     alt_text = models.CharField(max_length=255, blank=True)
     is_main = models.BooleanField(default=False)
