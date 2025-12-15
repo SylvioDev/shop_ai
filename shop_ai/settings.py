@@ -13,13 +13,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-import cloudinary.api
-import cloudinary.uploader
-
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
-import os
 
 cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
