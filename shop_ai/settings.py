@@ -202,3 +202,7 @@ DOMAIN_URL = 'http://localhost:8000/'
 CSRF_TRUSTED_ORIGINS = [
     "https://shopai-production-fac8.up.railway.app",
 ]
+
+# Admin credentials
+ADMIN_USER = os.getenv('ADMIN_USER')
+ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
