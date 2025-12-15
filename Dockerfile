@@ -16,10 +16,11 @@ COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-COPY . . 
-
-RUN python manage.py collectstatic --noinput 
+COPY . .
 
 EXPOSE 8000
 
-CMD ["gunicorn", "shop_ai.wsgi:application", "--bind",  "0.0.0.0:8000"]
+# Run migrations + collectstatic at runtime, then start server
+CMD python manage.py migrate && \
+    python manage.py collectstatic --noinput && \
+    gunicorn shop_ai.wsgi:application --bind 0.0.0.0:8000
