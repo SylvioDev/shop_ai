@@ -88,10 +88,14 @@ WSGI_APPLICATION = 'shop_ai.wsgi.application'
 import dj_database_url
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL')
-    )
-    
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('PGDATABASE', 'shopai'),
+        'USER': os.environ.get('PGUSER', 'postgres'),
+        'PASSWORD': os.environ.get('PGPASSWORD', 'password'),
+        'HOST': os.environ.get('PGHOST', 'db'),  # Railway will override this
+        'PORT': os.environ.get('PGPORT', '5432'),
+    }
 }
 
 # Password validation
