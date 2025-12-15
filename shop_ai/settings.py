@@ -196,3 +196,9 @@ STRIPE_PUB_KEY = os.getenv('STRIPE_PUB_KEY')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
 DOMAIN_URL = 'http://localhost:8000/'
 
+# settings.py
+
+# Only add in production
+CSRF_TRUSTED_ORIGINS = [
+    "https://shopai-production-fac8.up.railway.app",
+]
