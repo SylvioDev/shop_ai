@@ -30,6 +30,7 @@ from django.http import HttpResponse
 from django.utils.http import urlsafe_base64_decode
 from django.core.mail import send_mail
 from apps.container import container
+import os
 
 def activate_account(request, uidb64, token):
     """
@@ -95,6 +96,7 @@ class LoginView(FormView):
     def get(self, request):
         """ Display the login page with LoginForm """
         form = self.form_class()
+        print(os.getenv('DATABASE_URL'))
         return render(request, self.template_name, {'form' : form})
     
     def post(self, request):
