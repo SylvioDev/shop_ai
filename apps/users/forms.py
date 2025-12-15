@@ -45,7 +45,7 @@ class SignupForm(forms.Form):
             attrs = {
                 'class' : 'form-control input-sm',
                 'placeholder' : 'Password',
-                'id' : 'password'
+                'id' : 'confirm-password'
             }
         ),
         error_messages = {
