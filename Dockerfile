@@ -20,7 +20,7 @@ COPY . .
 
 EXPOSE 8000
 
-RUN python manage.py collectstatic --noinput
+#RUN python manage.py collectstatic --noinput
 
 # Run migrations + collectstatic at runtime, then start server
 CMD python manage.py makemigrations && \
