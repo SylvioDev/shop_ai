@@ -2,12 +2,14 @@ asgiref==3.10.0
 certifi==2025.11.12
 cffi==2.0.0
 charset-normalizer==3.4.4
+cloudinary==1.44.1
 crispy-bootstrap5==2025.6
 cryptography==46.0.3
 decouple==0.0.7
 defusedxml==0.7.1
 dj-database-url==3.0.1
 Django==5.2.4
+django-cloudinary-storage==0.3.0
 django-crispy-forms==2.5
 djangorestframework==3.16.1
 factory_boy==3.3.3
