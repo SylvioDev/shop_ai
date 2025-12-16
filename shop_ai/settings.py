@@ -211,7 +211,10 @@ ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    }
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
 }
 
 cloudinary.config(
