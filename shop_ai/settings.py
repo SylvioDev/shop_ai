@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',  # Only for media files
+    'cloudinary',
     'apps.products',
     'apps.cart',
     'apps.checkout',
@@ -49,8 +51,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'social_django',
-    'cloudinary_storage',  # Only for media files
-    'cloudinary',
+    
 ]
 
 MIDDLEWARE = [
