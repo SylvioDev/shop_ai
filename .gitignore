@@ -60,3 +60,5 @@ shop_ai/__pycache__/settings.cpython-313.pyc
 shop_ai/__pycache__/urls.cpython-313.pyc
 shopai-env/
 .dockerignore
+apps/products/__pycache__/models.cpython-313.pyc
+apps/products/__pycache__/models.cpython-313.pyc
