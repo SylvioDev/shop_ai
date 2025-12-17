@@ -8,3 +8,6 @@ DATABASES = {
 }
 
 PASSWORD_RESET_TIMEOUT = 2
+STORAGES["staticfiles"] = {
+    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+}
