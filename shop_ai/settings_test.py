@@ -1,34 +1,39 @@
+# --- shop_ai/settings_test.py ---
 from .settings import *
 
-# Use an in-memory SQLite database for tests
-DATABASES = {
+# 1. Provide dummy credentials so the library doesn't crash on import
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'test_db',
+    'API_KEY': 'test_key',
+    'API_SECRET': 'test_secret'
+}
+
+# 2. Redirect all file saving to local memory (super fast, no files created)
+STORAGES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": ":memory:",
+        "BACKEND": "django.core.files.storage.InMemoryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+# 3. Explicitly override the old style storage setting
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.InMemoryStorage'
+
+# 4. Remove cloudinary from INSTALLED_APPS for the test process
+# This prevents the library from trying to validate credentials
+INSTALLED_APPS = [app for app in INSTALLED_APPS if not app.startswith('cloudinary')]
+
+# 5. Use a faster password hasher for tests
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+]
+
+# 6. Ensure we use an in-memory DB or a specific test DB if not using DATABASE_URL
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
     }
 }
-
-PASSWORD_RESET_TIMEOUT = 2
-
-# Ensure static files are stored locally in tests
-STORAGES["staticfiles"] = {
-    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
-}
-
-import os
-
-# Disable Cloudinary in the test environment
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-
-# Disable Cloudinary settings entirely
-CLOUDINARY_URL = None
-CLOUD_NAME = None
-API_KEY = None
-API_SECRET = None
-
-# Optional: Disable Cloudinary storage backend if you're using one
-CLOUDINARY_STORAGE = None
-
-# Set the MEDIA_URL and MEDIA_ROOT for the test environment
-MEDIA_URL = '/media/'  # This can be adjusted based on your app's needs
-MEDIA_ROOT = os.path.join(BASE_DIR, 'test_media')  # Save files in 'test_media' directory

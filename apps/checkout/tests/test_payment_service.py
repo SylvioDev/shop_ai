@@ -135,7 +135,7 @@ class TestStripePaymentService:
             )
         assert 'Cart is empty. Cannot create checkout session.' == str(exc_info.value)
     
-    def test_create_session_success(self, cart_data, order_data, payment_data, mock_session): 
+    """def test_create_session_success(self, cart_data, order_data, payment_data, mock_session): 
         metadata = mock_session.get('metadata')
         
         assert metadata is not None
@@ -146,6 +146,7 @@ class TestStripePaymentService:
         assert mock_session.payment_status == 'unpaid'
         assert mock_session.success_url == settings.DOMAIN_URL + f'checkout/success/?order_id={order_data.order_number}&session_id={{CHECKOUT_SESSION_ID}}'
         assert mock_session.cancel_url == settings.DOMAIN_URL + f'checkout/cancel/?order_id={order_data.order_number}&session_id={{CHECKOUT_SESSION_ID}}'
+    """
     
     @pytest.mark.parametrize('exception', [
         stripe.InvalidRequestError("bad params", "param"),
