@@ -10,7 +10,10 @@ DATABASES = {
 
 PASSWORD_RESET_TIMEOUT = 2
 
-
+# Ensure static files are stored locally in tests
+STORAGES["staticfiles"] = {
+    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+}
 
 import os
 
