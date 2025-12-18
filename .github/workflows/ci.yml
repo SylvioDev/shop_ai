@@ -46,7 +46,7 @@ env:
   CLOUDINARY_API_KEY : fake
   CLOUDINARY_API_SECRET : llm
   CLOUDINARY_URL: cloudinary://fakekey:fakesecret@fakecloud
-  CLOUDINARY_NAME : fake-cloud
+  CLOUDINARY_NAME : fakecloud
   STRIPE_PUB_KEY : fake-pub
   STRIPE_STRIP_KEY : test
   STRIPE_WEBHOOK_SECRET : secret
