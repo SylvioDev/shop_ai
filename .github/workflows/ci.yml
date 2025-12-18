@@ -37,5 +37,7 @@ jobs:
 
       - name: Check migrations
         run: python manage.py makemigrations --check
-
+      
+      - name : Run tests
+        run : pytest --ds=shop_ai.settings_test -s -v
      
