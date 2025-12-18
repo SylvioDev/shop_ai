@@ -43,3 +43,11 @@ jobs:
 
 env:
   SECRET_KEY : fake-ci-secret-key
+  CLOUDINARY_API_KEY : fake
+  CLOUDINARY_API_SECRET : llm
+  CLOUDINARY_URL : fake-url
+  CLOUDINARY_NAME : fake-cloud
+  STRIPE_PUB_KEY : fake-pub
+  STRIPE_STRIP_KEY : test
+  STRIPE_WEBHOOK_SECRET : secret
+  
