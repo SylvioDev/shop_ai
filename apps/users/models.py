@@ -33,7 +33,7 @@ class UserProfile(models.Model):
     profile_picture = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
     social_media_username = models.CharField(null=True, max_length=100)
     reset_token_used = models.BooleanField(default=False)
-    phone_number = models.CharField(null=False, default='000 000 00 000')
+    phone_number = models.CharField(null=False, default='000 000 00 000', max_length=255)
 
     def __str__(self):
         return f'{self.user.username} Profile' 
