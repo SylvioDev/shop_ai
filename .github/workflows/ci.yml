@@ -39,13 +39,13 @@ jobs:
         run: python manage.py makemigrations --check
       
       - name : Run tests
-        run : pytest  -s -v
+        run : pytest --ds=shop_ai.settings_test -s -v
 
 env:
   SECRET_KEY : fake-ci-secret-key
   CLOUDINARY_API_KEY : fake
   CLOUDINARY_API_SECRET : llm
-  CLOUDINARY_URL : fake-url
+  CLOUDINARY_URL: cloudinary://fakekey:fakesecret@fakecloud
   CLOUDINARY_NAME : fake-cloud
   STRIPE_PUB_KEY : fake-pub
   STRIPE_STRIP_KEY : test
