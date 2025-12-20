@@ -79,7 +79,6 @@
             </div>
 
             
-            
             <div class="row mb-4">
               <div class="col-md-6">
                 <label class="form-label">Facebook Username</label>
@@ -92,6 +91,35 @@
               </div>
 
             </div>
+
+            <!-- User address !-->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <label class="form-label">Street address</label>
+                <input type="text" name="street_address" class="form-control" value = "{{ address.street_address }}" placeholder="Street Address" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">City</label>
+                <input type="text" name="city" class="form-control" value = "{{ address.city }}" placeholder="City" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">State</label>
+                <input type="text" name="state" class="form-control" value = "{{ address.state }}" placeholder="State" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">ZIP Code</label>
+                <input type="text" name="zip-code" class="form-control" value = "{{ address.zip_code }}" placeholder="ZIP Code" />
+              </div>
+
+            </div>
+
+            
+
+            <!-- User address !-->
+
 
             <div class="text-end">
               <button type="submit" class="btn btn-update">

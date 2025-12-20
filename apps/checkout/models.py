@@ -18,9 +18,9 @@ class Payment(models.Model):
         ('failed', 'Failed')
     ]
     order = models.OneToOneField('orders.Order', on_delete=models.CASCADE, related_name='payment')
-    method = models.CharField(choices=PAYMENT_METHODS)
-    provider = models.CharField(choices=PAYMENT_PROVIDERS, default=('stripe'))
-    status = models.CharField(choices=PAYMENT_STATUS)
+    method = models.CharField(choices=PAYMENT_METHODS, max_length=255)
+    provider = models.CharField(choices=PAYMENT_PROVIDERS, default=('stripe'), max_length=255)
+    status = models.CharField(choices=PAYMENT_STATUS, max_length=255)
     stripe_payment_intent_id = models.TextField(default='67N9717781765035V', null=True)
     stripe_session_id = models.TextField(default='1234')
     transaction_id = models.CharField(max_length=255, default='SDQSA')

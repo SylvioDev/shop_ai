@@ -20,7 +20,7 @@ COPY . .
 
 EXPOSE 8000
 
-# Run migrations + collectstatic at runtime, then start server
-CMD python manage.py collectstatic --noinput --clear && \
-    python manage.py migrate && \
-    gunicorn shop_ai.wsgi:application --bind 0.0.0.0:8000
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

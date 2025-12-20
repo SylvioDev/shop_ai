@@ -1,0 +1,54 @@
+name: Django CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check migrations
+        run: python manage.py makemigrations --check
+      
+      - name : Run tests
+        run : pytest --ds=shop_ai.settings_test -s -v
+
+env:
+  SECRET_KEY : fake-ci-secret-key
+  # STRIPE 
+  STRIPE_PUB_KEY : fake-pub
+  STRIPE_STRIP_KEY : test
+  STRIPE_WEBHOOK_SECRET : secret
+  # CLOUDINARY 
+  CLOUDINARY_URL: cloudinary://fakeapikey:fakeapisecret@fakename
+  CLOUD_NAME: fakename
+  CLOUDINARY_API_KEY: fakeapikey
+  CLOUDINARY_API_SECRET: fakeapisecret

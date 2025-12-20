@@ -97,7 +97,7 @@ class ProductVariant(models.Model):
     stock = models.PositiveIntegerField(default=0)
     discount = models.DecimalField(max_digits=10, default=0.0, blank=True, null=True, decimal_places=2)
     old_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
-    identifiant = models.CharField(null=False, default="name")
+    identifiant = models.CharField(null=False, default="name", max_length=255)
 
     def save(self, force_insert = False , *args, **kwargs):
         if not self.sku:

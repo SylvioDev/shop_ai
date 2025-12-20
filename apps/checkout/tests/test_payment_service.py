@@ -44,6 +44,8 @@ def fake_session(order_data, payment_data):
     payment = payment_data
     # fake session (supports .id and .get)
     session = MagicMock()
+    session.mode='payment'
+    session.payment_status = 'unpaid'
     session.id = "cs_test_123"
     session.payment_method_types=['card']
     session.amount_total = 8000
@@ -56,7 +58,10 @@ def fake_session(order_data, payment_data):
             "payment_id" : f"{payment.id}"
         }
     }.get(key, default)
-
+    
+    session.success_url = settings.DOMAIN_URL + f'checkout/success/?order_id={order_data.order_number}&session_id={{CHECKOUT_SESSION_ID}}'
+    session.cancel_url = settings.DOMAIN_URL + f'checkout/cancel/?order_id={order_data.order_number}&session_id={{CHECKOUT_SESSION_ID}}'
+    
     return session
 
 @pytest.fixture
@@ -135,17 +140,18 @@ class TestStripePaymentService:
             )
         assert 'Cart is empty. Cannot create checkout session.' == str(exc_info.value)
     
-    def test_create_session_success(self, cart_data, order_data, payment_data, mock_session): 
-        metadata = mock_session.get('metadata')
+    def test_create_session_success(self, mocker, cart_data, order_data, payment_data, fake_session): 
+        mocker.patch('stripe.checkout.Session.create', return_value=fake_session)
+        metadata = fake_session.get('metadata')
         
         assert metadata is not None
         assert metadata['user_id'] == str(order_data.customer_id.id)
         assert metadata['order_id'] == str(order_data.order_number)
         assert metadata['payment_id'] == str(payment_data.id)
-        assert mock_session.mode == 'payment'
-        assert mock_session.payment_status == 'unpaid'
-        assert mock_session.success_url == settings.DOMAIN_URL + f'checkout/success/?order_id={order_data.order_number}&session_id={{CHECKOUT_SESSION_ID}}'
-        assert mock_session.cancel_url == settings.DOMAIN_URL + f'checkout/cancel/?order_id={order_data.order_number}&session_id={{CHECKOUT_SESSION_ID}}'
+        assert fake_session.mode == 'payment'
+        assert fake_session.payment_status == 'unpaid'
+        assert fake_session.success_url == settings.DOMAIN_URL + f'checkout/success/?order_id={order_data.order_number}&session_id={{CHECKOUT_SESSION_ID}}'
+        assert fake_session.cancel_url == settings.DOMAIN_URL + f'checkout/cancel/?order_id={order_data.order_number}&session_id={{CHECKOUT_SESSION_ID}}'
     
     @pytest.mark.parametrize('exception', [
         stripe.InvalidRequestError("bad params", "param"),

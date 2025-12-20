@@ -62,3 +62,6 @@ shopai-env/
 .dockerignore
 apps/products/__pycache__/models.cpython-313.pyc
 apps/products/__pycache__/models.cpython-313.pyc
+apps/__pycache__/utils.cpython-313.pyc
+apps/products/__pycache__/repositories.cpython-313.pyc
+apps/products/__pycache__/services.cpython-313.pyc

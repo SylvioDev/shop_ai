@@ -387,7 +387,8 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
                       {
                           'user' : user,
                           'full_name' : full_name(user),
-                          'membership_date' : parse_date(str(user.date_joined))
+                          'membership_date' : parse_date(str(user.date_joined)),
+                          'address' : container.user_service.get_user_address(user)
                       }
                     )
     
