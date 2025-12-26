@@ -4,7 +4,8 @@ from .models import (
 )
 from django.db.models import Q
 from django.contrib.auth.models import User as UserAnnotation
-
+from apps.container import container
+from django.core.files.uploadedfile import UploadedFile
 class SignupRepository:
     """
     Handles database interactions for signup workflow.
@@ -70,9 +71,70 @@ class UserRepository:
         """
         user_address = Address.objects.get(user=user_instance)
         return user_address
-
-
+    
+    def update_user_credentials(self, user_instance : User, data : dict) -> User:
+        """
+        Update user credentials
         
+        Args:
+            user_instance (User): The user instance whose profile picture is to be updated.
+            data (dict) : Dictionary that contains user informations to update.
+        
+        Returns:
+            User: The updated user instance with the new informations.
+        
+        """
+        username = data.get('username')
+        first_name = data.get('first_name')
+        last_name = data.get('last_name')
+        facebook_username = data.get('facebook')
+        phone_number = data.get('phone-number')
+    
+        user_instance.username = username
+        user_instance.first_name = first_name
+        user_instance.last_name = last_name
+        user_instance.userprofile.social_media_username = facebook_username
+        user_instance.userprofile.phone_number = phone_number
+        user_instance.save()
+    
+        return user_instance
+    
+    def update_user_picture(self, user_instance : User, profile_pic : UploadedFile) -> User:
+        """
+        Update user's profile picture.
+        
+        Args:
+            user_instance (User): The user instance whose profile picture is to be updated.
+            profile_pic (UploadedFile): The new profile picture file to upload.
+            
+        Returns:
+            User: The updated user instance with the new profile picture.
+        
+        """
+        user_instance.userprofile.profile_picture.save(profile_pic.name, profile_pic)
+        user_instance.userprofile.save()
+
+        return user_instance
+    
+    def update_user_address(self, user_instance : User, data : dict) -> Address:
+        """
+        Update user address information
+        
+        Args:
+            user_instance (User): The user instance whose profile picture is to be updated.
+            data (dict) : Dictionary that contains user informations to update.
+        
+        Returns:
+            User: The updated address instance with the new informations.
+        """
+        address = container.user_service.get_user_address(user_instance)
+        address.street_address = data.get('street_address')
+        address.city = data.get('city')
+        address.state = data.get('state')
+        address.zip_code = data.get('zip-code')
+        address.save()
+        
+        return address        
 
 
     

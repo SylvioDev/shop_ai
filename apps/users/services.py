@@ -4,6 +4,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.contrib.auth.models import User
+from apps.container import container
 
 def get_backend(user : User):
     backend = get_backends()[0]
@@ -173,7 +174,19 @@ class UserService:
         user_address = self.repository.retrieve_adress(user_instance)
         return user_address
 
+    def update_profile(self, user_instance : User, data : dict):
+        """
+        Update user profile informations
+        
+        Args:
+            user_instance (user) : The user instance to update.
+            data (dict) : Dictionary that contains user informations to update from request.
+            
+        """
+        address = container.user_repo.update_user_address(user_instance, data)
+        profile = container.user_repo.update_user_credentials(user_instance, data)
+        
+        if data['profile-pic'] is not None:
+            profile_picture = container.user_repo.update_user_picture(user_instance, data['profile-pic'])
 
-    
-
-    
+        
