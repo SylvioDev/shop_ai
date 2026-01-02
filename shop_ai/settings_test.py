@@ -38,4 +38,4 @@ DATABASES = {
     }
 }
 
-DOMAIN_URL = 'http://localhost:8000/'
+#DOMAIN_URL = 'http://localhost:8000/'
