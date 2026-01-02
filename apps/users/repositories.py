@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User as UserAnnotation
 from apps.container import container
 from django.core.files.uploadedfile import UploadedFile
+from apps.users.utils import validate_required_keys
 class SignupRepository:
     """
     Handles database interactions for signup workflow.
@@ -84,6 +85,10 @@ class UserRepository:
             User: The updated user instance with the new informations.
         
         """
+        required_keys = ['username', 'first_name', 'last_name', 'facebook', 'phone-number']
+        # Key validation
+        validate_required_keys(data, required_keys)
+        
         username = data.get('username')
         first_name = data.get('first_name')
         last_name = data.get('last_name')
@@ -125,8 +130,12 @@ class UserRepository:
             data (dict) : Dictionary that contains user informations to update.
         
         Returns:
-            User: The updated address instance with the new informations.
+            Address: The updated address instance with the new informations.
         """
+        required_keys = ['street_address', 'city', 'state', 'zip-code']
+        # Key validation
+        validate_required_keys(data, required_keys)
+        
         address = container.user_service.get_user_address(user_instance)
         address.street_address = data.get('street_address')
         address.city = data.get('city')
