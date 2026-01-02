@@ -133,8 +133,7 @@ def valid_user():
     )
     
     address.save()
-    user.set_password('123')
-    user.save()
+    
         
     return user
 

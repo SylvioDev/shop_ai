@@ -33,15 +33,15 @@ class TestLoginRepository:
     def test_login_successful(self, valid_user, identifier):
         user = container.login_repo.get_by_email_or_username(
             identifier=identifier,
-            password='123'
+            password='mypassword'
         )
         assert isinstance(user, User)
         assert user.username == 'test'
         assert user.email == valid_user.email
     
     @pytest.mark.parametrize('identifier, password', [
-        ('unknown', '123'),
-        ('unknown@email.com', '123'),
+        ('unknown', 'mypassword'),
+        ('unknown@email.com', 'mypassword'),
         ('test@example.com', '548')
     ])
     def test_login_failure(self, valid_user, identifier, password):
