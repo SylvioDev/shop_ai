@@ -37,3 +37,4 @@ DATABASES = {
         'NAME': ':memory:',
     }
 }
+

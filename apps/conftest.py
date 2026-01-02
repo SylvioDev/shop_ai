@@ -117,9 +117,11 @@ def valid_user():
     user = User.objects.create_user(
         username='test',
         email='test@example.com',
-        password='mypassword'
+        password='mypassword',
+        last_name = 'Complete',
+        first_name = 'Test',
     )
-    user.save()
+    
     address = Address.objects.create(
         user=user,
         address_type='shipping',
@@ -129,7 +131,10 @@ def valid_user():
         zip_code = 70028,
         street_address='Hans Meier Gerechtigkeistgasse 10 3011 Berne'
     )
+    
     address.save()
+    
+        
     return user
 
 def checkout_user(username, user_address):
@@ -203,3 +208,4 @@ def payment_data(cart_data, order_data):
         amount=cart_data.get_cart_summary()['total_price']
     )
     return payment
+

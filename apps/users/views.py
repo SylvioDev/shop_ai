@@ -30,7 +30,6 @@ from django.http import HttpResponse
 from django.utils.http import urlsafe_base64_decode
 from django.core.mail import send_mail
 from apps.container import container
-import os
 
 def activate_account(request, uidb64, token):
     """
@@ -394,22 +393,20 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
     
     def post(self, request):
         user = request.user
-        username = request.POST.get('username')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        profile_picture = request.FILES['profile-pic'] if request.FILES else None
-        facebook_username = request.POST.get('facebook')
-        phone_number = request.POST.get('phone-number')
-        user.username = username
-        user.first_name = first_name
-        user.last_name = last_name
-        user.userprofile.social_media_username = facebook_username
-        user.userprofile.phone_number = phone_number
-        if profile_picture:
-            user.userprofile.profile_picture.save(profile_picture.name, profile_picture)
-            user.userprofile.save()
+        data = {}
+        # user credentials
+        data['username'] = request.POST.get('username')
+        data['first_name'] = request.POST.get('first_name')
+        data['last_name'] = request.POST.get('last_name')
+        data['profile-pic'] = request.FILES['profile-pic'] if request.FILES else None
+        data['facebook'] = request.POST.get('facebook')
+        data['phone-number'] = request.POST.get('phone-number')
+        # user address 
+        data['street_address'] = request.POST.get('street_address')
+        data['city'] = request.POST.get('city')
+        data['state'] = request.POST.get('state')
+        data['zip-code'] = request.POST.get('zip-code')
         
-        user.save()
-
+        container.user_service.update_profile(user, data)
 
         return redirect('profile')
