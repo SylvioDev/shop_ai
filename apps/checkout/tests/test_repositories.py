@@ -16,10 +16,7 @@ from apps.orders.models import Order
 from apps.users.models import User
 from apps.checkout.models import Payment
 from apps.products.models import Product, ProductVariant
-
-pytestmark = pytest.mark.django_db
-
-
+from apps.conftest import pytestmark
 class TestCheckoutRepository:        
     def test_create_order(self, cart_data, total_amount_test, cart_summary_test):
         order = user_order(cart_data, 'paul', '123 East 85th Street, Apt 5G, New York, NY 10028')

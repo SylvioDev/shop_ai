@@ -131,10 +131,7 @@ def valid_user():
         zip_code = 70028,
         street_address='Hans Meier Gerechtigkeistgasse 10 3011 Berne'
     )
-    
     address.save()
-    
-        
     return user
 
 def checkout_user(username, user_address):
@@ -201,6 +198,15 @@ def order_data(cart_data):
     return order
 
 @pytest.fixture
+def test_order(cart_data, valid_user):
+    order = container.checkout_repo.create_order(
+        user=valid_user,
+        cart_data=cart_data.cart,
+        total_amount=cart_data.get_cart_summary()['total_price']
+    )
+    return order
+
+@pytest.fixture
 def payment_data(cart_data, order_data):
     payment = container.checkout_repo.create_payment(
         order=order_data,
@@ -213,3 +219,20 @@ def payment_data(cart_data, order_data):
 def order_items(order_data, cart_data):
     items = container.checkout_service.add_order_items(order_data, cart_data.cart)
     return items
+
+@pytest.fixture
+def login_user(client, order_data):
+    login_response = client.post(
+            reverse('login'), 
+            data = {
+                'identifier':'Paul', 
+                'password':'password', 
+                'next': reverse('orders')
+            }
+        )
+    assert login_response.status_code == 302
+    assert login_response.url == reverse('orders')
+
+@pytest.fixture
+def paul_user(order_data):
+    return User.objects.get(username='Paul')        

@@ -27,8 +27,7 @@ from apps.checkout.custom_exceptions import (
 )
 from unittest.mock import Mock
 from django.conf import settings
-
-pytestmark = pytest.mark.django_db
+from apps.conftest import pytestmark
 
 @pytest.fixture
 def home_url():

@@ -18,6 +18,7 @@ from apps.checkout.custom_exceptions import (
 )
 from apps.checkout.payment_service import StripePaymentService
 from apps.checkout.repositories import CheckoutRepository
+from apps.conftest import pytestmark
 
 @pytest.fixture
 def fake_secret():
@@ -109,8 +110,6 @@ def failed_event(failed_pi):
     
     return mock_event
     
-pytestmark = pytest.mark.django_db
-
 class TestStripePaymentService:    
     def test_initialization(self):
         service = container.payment_service

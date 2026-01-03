@@ -4,12 +4,11 @@ from apps.conftest import (
     variant_sku,
     variant_product,
     product,
-    sample_products
+    sample_products,
+    pytestmark
 )
 from apps.products.models import Category
 from apps.container import container
-
-pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def category():

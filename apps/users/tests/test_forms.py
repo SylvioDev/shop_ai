@@ -1,10 +1,10 @@
 import pytest
 from django.contrib.auth.models import User
 from apps.users.forms import SignupForm
+from apps.conftest import pytestmark
 
 #### SignupForm Test ####
 
-@pytest.mark.django_db
 def test_empty_username():
     """
     Test for empty username field
@@ -19,7 +19,6 @@ def test_empty_username():
     assert form.is_valid() is False 
     assert 'Username field is required' in ''.join(form.errors['username'])
 
-@pytest.mark.django_db
 def test_empty_email():
     """
     Test for empty email field
@@ -34,7 +33,6 @@ def test_empty_email():
     assert form.is_valid() is False 
     assert 'Email field is required' in ''.join(form.errors['email'])
 
-@pytest.mark.django_db
 def test_empty_password():
     """
     Test for empty password field
@@ -49,8 +47,6 @@ def test_empty_password():
     assert form.is_valid() is False 
     assert 'Password field is required' in ''.join(form.errors['password'])
 
-
-@pytest.mark.django_db
 def test_empty_confirm_password():
     """
     Test for empty confirm_password field
@@ -65,7 +61,6 @@ def test_empty_confirm_password():
     assert form.is_valid() is False 
     assert 'Confirm Password field is required' in ''.join(form.errors['confirm_password'])
 
-@pytest.mark.django_db
 def test_user_already_exists_by_username():
     """ 
     Test signup view, creates a user and 
@@ -87,7 +82,6 @@ def test_user_already_exists_by_username():
     assert form.is_valid() is False 
     assert 'Username' in ''.join(form.errors['username'])  
 
-@pytest.mark.django_db
 def test_user_already_exists_by_email():
     """ 
     Test signup view, creates a user and 
@@ -109,7 +103,6 @@ def test_user_already_exists_by_email():
     assert form.is_valid() is False 
     assert 'An account with this email' in ''.join(form.errors['email'])
 
-@pytest.mark.django_db
 def test_passwords_do_not_match():
     """ 
     Test for password and confirm_password do not match
@@ -124,10 +117,9 @@ def test_passwords_do_not_match():
     assert form.is_valid() is False 
     assert 'do not match' in ''.join(form.errors['__all__'])
 
-@pytest.mark.django_db
 def test_valid_signup_form():
     """ 
-    Test for valid signu form form.is_valid() == True
+    Test for valid signup form form.is_valid() == True
     """
     form = SignupForm(data={
         'username' : 'rakoto',

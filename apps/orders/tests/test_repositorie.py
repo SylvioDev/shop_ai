@@ -4,12 +4,11 @@ from django.contrib.auth.models import User
 from apps.conftest import (
     valid_user,
     order_data,
-    order_items
+    order_items,
+    pytestmark
 )
 from apps.orders.models import Order
 from apps.container import container
-
-pytestmark = pytest.mark.django_db
 
 class TestOrderRepository:
     def test_retrieve_user_orders_success(self, order_data):

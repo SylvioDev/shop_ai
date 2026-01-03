@@ -1,11 +1,12 @@
 import pytest 
 from apps.container import container
 from apps.conftest import valid_user
+from apps.conftest import pytestmark
 from apps.users.models import User
 from apps.users.models import Address
 from django.urls import reverse
 
-pytestmark = pytest.mark.django_db
+
 
 class TestSignupRepository:
     def test_user_creation(self):
