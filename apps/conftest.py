@@ -209,3 +209,7 @@ def payment_data(cart_data, order_data):
     )
     return payment
 
+@pytest.fixture
+def order_items(order_data, cart_data):
+    items = container.checkout_service.add_order_items(order_data, cart_data.cart)
+    return items
