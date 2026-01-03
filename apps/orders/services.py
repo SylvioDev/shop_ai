@@ -2,7 +2,7 @@ from .models import Order
 from .models import OrderItem
 from apps.users.models import User
 from apps.container import container
-
+from apps.checkout.custom_exceptions import OrderNotFoundError
 class OrderService:
     """
     Service responsible for processing order-related business logic.
@@ -32,7 +32,11 @@ class OrderService:
             dict: A dictionary containing order details for receipt generation.
             
         """
-        order = container.order_repo.retrieve_order_details(order_id) 
+        try:
+            order = container.order_repo.retrieve_order_details(order_id) 
+        except Order.DoesNotExist:
+            raise OrderNotFoundError(order_id)
+        
         user = container.user_service.get_user_credentials(user_id=order.customer_id.id)
         
         full_name = user.first_name + ' ' + user.last_name

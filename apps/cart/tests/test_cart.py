@@ -13,8 +13,7 @@ from apps.factories import \
     VariantAttributeFactory,
     CategoryFactory
 )
-
-pytestmark = pytest.mark.django_db
+from apps.conftest import pytestmark
 
 @pytest.fixture
 def exceed_product(sku):

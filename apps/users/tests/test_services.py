@@ -1,8 +1,7 @@
 import pytest
 from django.contrib.auth.models import User
 from apps.container import container
-
-pytestmark = pytest.mark.django_db
+from apps.conftest import pytestmark
 
 @pytest.fixture
 def active_user():

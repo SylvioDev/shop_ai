@@ -15,4 +15,4 @@ def validate_required_keys(data : dict, required_keys : list):
             raise KeyError(
                 f'Missing keys : {','.join(missing)}'
             )
-    
+    return True

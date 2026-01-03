@@ -7,10 +7,9 @@ from apps.conftest import \
     sku,
     variant_product,
     product,
-    sample_products
+    sample_products,
+    pytestmark
 )
-
-pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def product_url():

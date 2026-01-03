@@ -195,7 +195,7 @@ class Cart:
             total_items (float) , number of all items
 
         """
-        self.total_items = sum(item['quantity'] for item in self.cart.values())
+        self.total_items = sum(item['quantity'] for item in self.cart.values() if isinstance(item, dict))
         return self.total_items
     
     def set_shipping_fee(self, amount):

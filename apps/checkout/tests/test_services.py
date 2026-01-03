@@ -17,8 +17,7 @@ from apps.checkout.models import Payment
 from apps.orders.models import OrderItem
 from unittest.mock import MagicMock
 from datetime import datetime, timezone
-
-pytestmark = pytest.mark.django_db
+from apps.conftest import pytestmark
 class TestCheckoutService:
     def test_cart_validation_empty_cart(self):
         cart = Cart({})

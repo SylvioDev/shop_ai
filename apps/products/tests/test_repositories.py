@@ -10,13 +10,11 @@ from apps.conftest import(
     product,
     variant_product,
     sku,
-    variant_sku
+    variant_sku,
+    pytestmark
 )
 from django.db.models import QuerySet
 from apps.container import container
-
-pytestmark = pytest.mark.django_db
-
 @pytest.mark.django_db
 class TestProductRepository:
     def test_get_product_by_category_failed(self, sample_products):

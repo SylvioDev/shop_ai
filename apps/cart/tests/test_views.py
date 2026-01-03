@@ -12,8 +12,7 @@ from apps.cart.tests.test_cart import (
     mock_session,
     cart
 )
-
-pytestmark = pytest.mark.django_db
+from apps.conftest import pytestmark
 
 @pytest.fixture
 def root_url():
