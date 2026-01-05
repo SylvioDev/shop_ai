@@ -1,6 +1,6 @@
 from django.urls import reverse
-from .models import Category
-from ..utils import get_full_image_url
+from apps.products.models import Category
+from apps.utils import get_full_image_url
 
 class ProductService:
     """
