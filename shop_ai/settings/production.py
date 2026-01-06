@@ -18,7 +18,7 @@ import cloudinary
 load_dotenv() # Load environment variables from .env files
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -234,24 +234,3 @@ STORAGES = {
 }
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-
-### TEMPORARY CHANGES ###
-
-# Add this RIGHT AFTER the BASE_DIR definition (around line 20)
-print("=" * 80)
-print("DEBUG: Checking template paths on Railway")
-print("BASE_DIR:", BASE_DIR)
-print("Templates dir path:", BASE_DIR / "templates")
-print("Templates dir exists:", os.path.exists(BASE_DIR / "templates"))
-
-if os.path.exists(BASE_DIR / "templates"):
-    print("Files in templates folder:", os.listdir(BASE_DIR / "templates"))
-    base_html_path = BASE_DIR / "templates" / "base.html"
-    print("base.html exists:", os.path.exists(base_html_path))
-else:
-    print("ERROR: Templates folder does NOT exist!")
-    print("Contents of BASE_DIR:", os.listdir(BASE_DIR))
-
-print("TEMPLATE DIRS config:", [BASE_DIR / "templates", BASE_DIR / "apps"])
-print("=" * 80)
