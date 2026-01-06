@@ -39,7 +39,7 @@ jobs:
         run: python manage.py makemigrations --check
       
       - name : Run tests
-        run : pytest --ds=shop_ai.settings_test -s -v
+        run : pytest --ds=shop_ai.settings.test -s -v
 
 env:
   SECRET_KEY : fake-ci-secret-key

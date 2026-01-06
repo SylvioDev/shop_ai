@@ -1,5 +1,5 @@
 # --- shop_ai/settings_test.py ---
-from .settings import *
+from shop_ai.settings.base import *
 
 # 1. Provide dummy credentials so the library doesn't crash on import
 CLOUDINARY_STORAGE = {
@@ -38,3 +38,4 @@ DATABASES = {
     }
 }
 
+DOMAIN_URL = 'http://localhost:8000/'

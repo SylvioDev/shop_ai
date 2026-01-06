@@ -8,7 +8,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.generic.detail import DetailView
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
+from shop_ai.settings import production
 import stripe
 from apps.cart.cart import Cart
 from .cart_validation.cart_exceptions import (
@@ -23,7 +23,7 @@ from apps.container import container
 from apps.orders.models import Order
 from apps.orders.models import OrderItem
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
+stripe.api_key = production.STRIPE_SECRET_KEY
 
 @login_required
 def home(request):

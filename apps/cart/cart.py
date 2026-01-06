@@ -1,5 +1,7 @@
 from apps.container import container
-from shop_ai.settings import CART_SESSION_ID 
+from django.conf import settings
+
+CART_SESSION_ID = settings.CART_SESSION_ID 
 class Cart:
     """
     Represents a cart in the system.
