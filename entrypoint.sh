@@ -29,8 +29,8 @@ END
 # Define settings module
 export DJANGO_SETTINGS_MODULE=shop_ai.settings.production
 
-echo "Applying database migrations..."
-python manage.py migrate --noinput
+#echo "Applying database migrations..."
+#python manage.py migrate --noinput
 
 echo "Collecting static files..."
 python manage.py collectstatic --noinput --clear
