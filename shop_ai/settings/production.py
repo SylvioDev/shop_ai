@@ -114,7 +114,9 @@ else:
         }
     }
 
-
+# Add this temporarily for debugging
+print(f"DATABASE_URL: {database_url}")
+print(f"DATABASES config: {DATABASES}")
 
 
 # Password validation
