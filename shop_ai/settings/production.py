@@ -20,7 +20,7 @@ import cloudinary
 load_dotenv() # Load environment variables from .env files
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -109,6 +109,9 @@ DATABASES['default']['CONN_MAX_AGE'] = 600
 
 # 4. Move this print to the VERY BOTTOM of settings.py
 print(f"--- VERIFYING DATABASES AT END OF SETTINGS: {DATABASES['default'].get('ENGINE')} ---")
+
+print(DATABASES)
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
