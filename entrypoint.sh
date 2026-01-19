@@ -3,7 +3,28 @@
 set -e
 
 echo "Waiting for database..."
-python manage.py check --database default
+# This waits until the postgres host is reachable on port 5432
+python << END
+import socket
+import time
+import os
+from urllib.parse import urlparse
+
+db_url = os.environ.get('DATABASE_URL')
+url = urlparse(db_url)
+host = url.hostname
+port = url.port or 5432
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+while True:
+    try:
+        s.connect((host, port))
+        s.close()
+        break
+    except socket.error:
+        print("Postgres unavailable, waiting...")
+        time.sleep(1)
+END
 
 echo "Applying database migrations..."
 python manage.py migrate --noinput
