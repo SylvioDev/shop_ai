@@ -211,11 +211,11 @@ CART_SESSION_ID = "cart"
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_PUB_KEY = os.getenv('STRIPE_PUB_KEY')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
-DOMAIN_URL = 'https://shopai-production-fac8.up.railway.app/'
+DOMAIN_URL = os.getenv('DOMAIN_URL')
 
 # CSRF Configuration
 CSRF_TRUSTED_ORIGINS = [
-    "https://shopai-production-fac8.up.railway.app",
+    os.getenv('DOMAIN_URL')
 ]
 
 # Admin credentials
