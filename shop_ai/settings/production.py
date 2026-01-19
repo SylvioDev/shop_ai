@@ -92,26 +92,23 @@ WSGI_APPLICATION = 'shop_ai.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 
-# 1. Pull the URL
-DATABASE_URL = os.getenv('DATABASE_URL')
+# 1. Get the raw string from Railway
+db_url = os.getenv('DATABASE_URL')
 
-# 2. Parse it into the DATABASES dict
-DATABASES = {
-    'default': dj_database_url.config(
-        default=DATABASE_URL,
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
-
-# 3. FORCE the engine (Railway URLs often start with postgresql:// which can confuse older parsers)
-if DATABASES.get('default'):
+if db_url:
+    DATABASES = {
+        'default': dj_database_url.parse(db_url)
+    }
+    # Explicitly force the engine to avoid the 'dummy' fallback
     DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
+    DATABASES['default']['CONN_MAX_AGE'] = 600
+else:
+    # If this hits in Railway, your environment variables aren't linked correctly
+    raise ValueError("DATABASE_URL environment variable is empty or not set.")
 
-# Debug print to verify everything in the Railway logs
-if DATABASES.get('default'):
-    print(f"DATABASE HOST: {DATABASES['default'].get('HOST')}")
-    print(f"DATABASE ENGINE: {DATABASES['default'].get('ENGINE')}")
+# This print is for your logs to verify the engine is locked in
+print(f"DEBUG: Final Engine is: {DATABASES['default'].get('ENGINE')}")
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
