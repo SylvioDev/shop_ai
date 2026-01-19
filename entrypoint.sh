@@ -26,6 +26,9 @@ while True:
         time.sleep(1)
 END
 
+# Define settings module
+export DJANGO_SETTINGS_MODULE=shop_ai.settings.production
+
 echo "Applying database migrations..."
 python manage.py migrate --noinput
 
