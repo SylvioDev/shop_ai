@@ -32,8 +32,8 @@ export DJANGO_SETTINGS_MODULE=shop_ai.settings.production
 echo "Applying database migrations..."
 python manage.py migrate --noinput --settings=shop_ai.settings.production
 
-#echo "Collecting static files..."
-#python manage.py collectstatic --noinput --clear --settings=shop_ai.settings.production
+echo "Collecting static files..."
+python manage.py collectstatic --noinput --clear --settings=shop_ai.settings.production
 
 echo "Starting Gunicorn..."
 exec gunicorn shop_ai.wsgi:application --bind 0.0.0.0:8000
