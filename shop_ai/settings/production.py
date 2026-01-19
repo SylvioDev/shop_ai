@@ -101,6 +101,14 @@ DATABASES = {
 }
 
 
+# DEBUG: Print database config
+print("FINAL DATABASES CONFIG:", DATABASES)
+if not DATABASES.get('default', {}).get('ENGINE'):
+    import sys
+    print("ERROR: ENGINE NOT SET!")
+    print("DATABASE_URL:", os.environ.get('DATABASE_URL', 'NOT SET'))
+    sys.exit(1)
+
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
