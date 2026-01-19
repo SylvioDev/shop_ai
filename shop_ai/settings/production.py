@@ -11,9 +11,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
 import cloudinary
+
 
 load_dotenv() # Load environment variables from .env files
 
@@ -89,7 +91,7 @@ WSGI_APPLICATION = 'shop_ai.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-import dj_database_url
+
 
 DATABASES = {
     'default': dj_database_url.config(
