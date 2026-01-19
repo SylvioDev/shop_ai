@@ -92,26 +92,21 @@ WSGI_APPLICATION = 'shop_ai.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 
-# 1. Get the URL
-_db_url = os.getenv('DATABASE_URL')
+# 1. Parse the URL manually into a dictionary
+_db_config = dj_database_url.parse(os.environ.get('DATABASE_URL'))
 
-if not _db_url:
-    raise ValueError("CRITICAL: DATABASE_URL is missing from environment variables!")
+# 2. Hard-set the engine and other vital keys
+_db_config.update({
+    'ENGINE': 'django.db.backends.postgresql',
+    'CONN_MAX_AGE': 600,
+})
 
-# 2. Define the dictionary in ONE shot
+# 3. Assign it to DATABASES in one final, atomic step
 DATABASES = {
-    'default': dj_database_url.parse(_db_url)
+    'default': _db_config
 }
 
-# 3. Force the engine key immediately
-DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
-DATABASES['default']['CONN_MAX_AGE'] = 600
-
-# 4. Move this print to the VERY BOTTOM of settings.py
-print(f"--- VERIFYING DATABASES AT END OF SETTINGS: {DATABASES['default'].get('ENGINE')} ---")
-
-print(DATABASES)
-
+print(f"--- FINAL ATTEMPT ENGINE: {DATABASES['default']['ENGINE']} ---")
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
