@@ -89,25 +89,14 @@ WSGI_APPLICATION = 'shop_ai.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('PGDATABASE'),
-        'USER': os.environ.get('PGUSER'),
-        'PASSWORD': os.environ.get('PGPASSWORD'),
-        'HOST': os.environ.get('PGHOST'),
-        'PORT': os.environ.get('PGPORT', '5432'),
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600
+    )
 }
-
-
-# DEBUG: Print database config
-print("FINAL DATABASES CONFIG:", DATABASES)
-if not DATABASES.get('default', {}).get('ENGINE'):
-    import sys
-    print("ERROR: ENGINE NOT SET!")
-    print("DATABASE_URL:", os.environ.get('DATABASE_URL', 'NOT SET'))
-    sys.exit(1)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
