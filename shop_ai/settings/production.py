@@ -92,17 +92,22 @@ WSGI_APPLICATION = 'shop_ai.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 
+# 1. Get the URL from the environment (Railway injects this automatically)
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+if not DATABASE_URL:
+    # This will give you a clear error in Railway logs if the variable is missing
+    raise ValueError("DATABASE_URL is not set. Check Railway environment variables.")
 
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+    'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
 }
 
-if DATABASES['default']:
-    DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
-    
-# Debug print (you'll see this in Railway logs)
-print(f"USING ENGINE: {DATABASES['default'].get('ENGINE')}")
+# 2. Force the engine to PostgreSQL (though dj_database_url usually handles this)
+DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
 
+# Debug print to confirm configuration in logs
+print(f"DATABASE CONNECTED TO: {DATABASES['default'].get('HOST')}")
 
 
 # Password validation
