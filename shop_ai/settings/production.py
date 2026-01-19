@@ -37,14 +37,14 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
 # Application definition
 
 INSTALLED_APPS = [
+    'cloudinary_storage',  # Only for media files
+    'cloudinary',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary_storage',  # Only for media files
-    'cloudinary',
     'apps.users.apps.UsersConfig',
     'apps.products',
     'apps.cart',
