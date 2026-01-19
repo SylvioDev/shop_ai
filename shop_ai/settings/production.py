@@ -94,13 +94,16 @@ WSGI_APPLICATION = 'shop_ai.wsgi.application'
 
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600
-    )
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
 
-print(DATABASES)
+if DATABASES['default']:
+    DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
+    
+# Debug print (you'll see this in Railway logs)
+print(f"USING ENGINE: {DATABASES['default'].get('ENGINE')}")
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
