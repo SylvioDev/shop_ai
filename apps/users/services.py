@@ -5,6 +5,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.contrib.auth.models import User
 from apps.container import container
+from apps.users.models import Address
 
 def get_backend(user : User):
     backend = get_backends()[0]
@@ -171,9 +172,12 @@ class UserService:
         Returns:
             Address instance associated with the user.
         """
-        user_address = self.repository.retrieve_adress(user_instance)
-        return user_address
-
+        try:
+            user_address = self.repository.retrieve_adress(user_instance)
+            return user_address
+        except Address.DoesNotExist as error:
+            return error
+        
     def update_profile(self, user_instance : User, data : dict):
         """
         Update user profile informations
