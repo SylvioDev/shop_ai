@@ -7,6 +7,7 @@ from django.contrib.auth.models import User as UserAnnotation
 from apps.container import container
 from django.core.files.uploadedfile import UploadedFile
 from apps.users.utils import validate_required_keys
+from apps.users.models import Address
 class SignupRepository:
     """
     Handles database interactions for signup workflow.
@@ -23,7 +24,6 @@ class SignupRepository:
     def get_by_email(self, email:str) -> UserAnnotation | None:
         """Retrieve user by email """
         return User.objects.filter(email=email).first()
-
 class LoginRepository:
     """
     Handles database interactions for login workflow.
@@ -144,6 +144,19 @@ class UserRepository:
         address.save()
         
         return address        
+    
+    def create_user_address(self, user_id : str):
+        """
+        Creates an empty address tied to user.
 
+        Args:
+            user_instance (User)
+
+        Returns:
+            instance of Address of the current user
+        """
+        user = User.objects.get(pk=user_id)
+        address = Address.objects.create(user=user, city='', state = '', zip_code='')
+        return address
 
     

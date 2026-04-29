@@ -5,9 +5,6 @@ from apps.conftest import pytestmark
 from apps.users.models import User
 from apps.users.models import Address
 from django.urls import reverse
-
-
-
 class TestSignupRepository:
     def test_user_creation(self):
         user = container.signup_repo.create(
@@ -118,3 +115,14 @@ class TestUserRepository:
             updated_address = container.user_repo.update_user_address(valid_user, data)
         assert 'Missing keys' in str(exc_info.value)
     
+    def test_user_address_creation_valid_user(self, valid_user):
+        address = container.user_repo.create_user_address(valid_user.id)
+        assert isinstance(address, Address)
+        assert address.city == ''
+        assert address.zip_code == ''
+        assert address.street_address == ''
+
+    def test_user_address_creation_invalid_user(self):
+        with pytest.raises(User.DoesNotExist) as exc_info:
+            address = container.user_repo.create_user_address(18)
+        assert str(exc_info.value) == 'User matching query does not exist.'

@@ -84,6 +84,7 @@ class SignupService:
             'is_active' : False
         }
         user = self.repo.create(**data)
+        container.user_repo.create_user_address(user.id)
         send_mail_confirm(domain, user)
         return user
 

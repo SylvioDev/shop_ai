@@ -2,13 +2,16 @@ import pytest
 from django.core import mail
 from django.urls import reverse
 from apps.users.models import User
+from apps.users.models import Address
 from apps.users.forms import LoginForm
+from apps.container import container
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 import re 
 from django.contrib.auth.tokens import default_token_generator
 from time import sleep
 from apps.conftest import pytestmark
+
 
 @pytest.fixture
 def valid_user():
@@ -198,8 +201,10 @@ class TestSignupView:
         assert new_response.status_code == 200
         assert 'Welcome, ! Your account has been activated.' in html
         active_user = User.objects.get(username='success')
+        address = container.user_repo.retrieve_adress(active_user)
+        assert isinstance(address, Address)
         assert active_user.is_active is True        
-        
+
 #### SignupTest ####
 
 #### PasswordResetTest ####

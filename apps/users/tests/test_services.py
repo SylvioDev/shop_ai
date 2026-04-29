@@ -2,6 +2,8 @@ import pytest
 from django.contrib.auth.models import User
 from apps.container import container
 from apps.conftest import pytestmark
+from apps.users.services import SignupService
+from apps.users.models import Address
 
 @pytest.fixture
 def active_user():
@@ -48,4 +50,24 @@ class TestLoginService:
             'password' : '123'
         })
         assert 'user' in result
+class TestSignupService:
+    def test_repo_initialization(self):
+        repo = container.signup_service
+        assert isinstance(repo, SignupService)
 
+    def test_signup_user_valid(self):
+        data = {
+            'username':'test', 
+            'password':'123',
+            'email':'test@gmail.com'
+        }
+        user = container.signup_service.signup_user('localhost', data)
+        assert isinstance(user, User)
+        address = container._user_repo.retrieve_adress(user)
+        assert isinstance(address, Address)
+
+    def test_signup_user_invalid(self):
+        data = {'userne':'toto', 'password':'8789', 'email':'toto@gmail.com'}
+        with pytest.raises(KeyError) as exc_info:
+            user = container.signup_service.signup_user('localhost', data)
+        assert str(exc_info.value) == "'username'"
