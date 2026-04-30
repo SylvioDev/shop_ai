@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'apps.cart',
     'apps.checkout',
     'apps.orders',
+    'apps.api',
     'crispy_forms',
     'crispy_bootstrap5',
     'social_django',
@@ -218,4 +219,11 @@ STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
+}
+
+# settings.py
+REST_FRAMEWORK = {
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_VERSION': 'v1',
+    'ALLOWED_VERSIONS': ['v1', 'v2'],
 }
