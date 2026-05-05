@@ -9,6 +9,6 @@ from .views import (
 urlpatterns = [
     path('', ListProductsView.as_view(), name='products'),
     path('filter-category/<category>', filter_category, name = 'filter-category'),
-    path('<slug>', ProductDetail.as_view(), name='product-detail'),
+    path('<slug>', ProductDetail.as_view(), name='product_detail'),
     path('update-variant/<product_sku>', update_variant, name='update-variant')
 ]
