@@ -10,6 +10,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import JSONParser
 from django_filters.rest_framework import DjangoFilterBackend
 from apps.products.models import Product
+from apps.api.v1.custom_permissions import ProductPermission
 from apps.api.v1.custom_filters import ProductFilter
 class ProductPagination(PageNumberPagination):
     page_size = 3
@@ -45,6 +46,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     ordering_fields = ['price']
     lookup_field = 'slug'
     pagination_class = ProductPagination
+    permission_classes = [ProductPermission]
 
 class RegisterJSONView(APIView):
     """

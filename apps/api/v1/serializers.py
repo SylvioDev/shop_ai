@@ -23,17 +23,20 @@ class ProductSerializer(serializers.ModelSerializer):
     """
     category = serializers.SlugRelatedField(
         slug_field='name',
-        queryset=Category.objects.all()
+        queryset=Category.objects.all(),
     )
     class Meta:
         model = Product
-        fields = ['name', 'slug', 'description', 'price', 'stock', 'status' , 'category']
+        fields = ['name', 'slug', 'description', 'price', 'stock', 'status', 'category']
+
 
     def validate_price(self, value):
         """Check that the price is not a negative value"""
         if value < 0:
             raise serializers.ValidationError('Price must be positive.')
         return value
+
+        
 class RegisterSerializer(serializers.ModelSerializer):
     """
     Serializer for user registration.
