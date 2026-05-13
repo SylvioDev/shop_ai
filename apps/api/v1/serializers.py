@@ -35,9 +35,7 @@ class ProductSerializer(serializers.ModelSerializer):
         """Check that the price is not a negative value"""
         if value < 0:
             raise serializers.ValidationError('Price must be positive.')
-        return value
-
-        
+        return value    
 class RegisterSerializer(serializers.ModelSerializer):
     """
     Serializer for user registration.
@@ -78,12 +76,12 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
-        slug_field='username',
+        slug_field='id',
         queryset=User.objects.all(),
     )
     class Meta:
         model = UserProfile
-        fields = ['social_media_username', 'phone_number', 'user']
+        fields = ['social_media_username', 'phone_number', 'user', 'profile_picture']
         
     def validate_phone_number(self, value : str):
         """Checks if the given value is a valid phone_number"""
@@ -95,6 +93,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.phone_number = validated_data.get('phone_number', instance.phone_number)
         instance.social_media_username = validated_data.get('social_media_username', instance.social_media_username)
+        instance.profile_picture = validated_data.get('profile_picture', instance.profile_picture)
         instance.save()
         return instance
     

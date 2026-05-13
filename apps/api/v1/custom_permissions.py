@@ -3,7 +3,10 @@ from rest_framework.permissions import SAFE_METHODS
 
 class ProductPermission(BasePermission):
     def has_permission(self, request, view):
-        if not request.is_staff:
+        if request.method in SAFE_METHODS:
+            return True
+        
+        if not request.user.is_staff:
             self.message = 'Only staff members can perform this operation'
             return False
 
