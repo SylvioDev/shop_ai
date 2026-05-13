@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from apps.products.models import Product
 from apps.products.models import Category
-from apps.users.models import Address
+from apps.users.models import UserProfile
 from django.contrib.auth.models import User
 from apps.container import container
+import re
 class ProductSerializer(serializers.ModelSerializer):
     """
     Serializer for Product model.
@@ -74,5 +75,33 @@ class RegisterSerializer(serializers.ModelSerializer):
         container.user_repo.create_user_address(user.id)
         user.save()
         return user
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(
+        slug_field='username',
+        queryset=User.objects.all(),
+    )
+    class Meta:
+        model = UserProfile
+        fields = ['social_media_username', 'phone_number', 'user']
+        
+    def validate_phone_number(self, value : str):
+        """Checks if the given value is a valid phone_number"""
+        pattern = re.fullmatch(r'(032|033|034|037|038) \d{2,2} \d{3,3} \d{2,2}$', value)
+        if not pattern:
+            raise ValueError('Phone number should be 03(2|3|4|7|8) xx xxx xx')
+        return value
+
+    def update(self, instance, validated_data):
+        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
+        instance.social_media_username = validated_data.get('social_media_username', instance.social_media_username)
+        instance.save()
+        return instance
+    
+class UserSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer(source='userprofile', read_only=True)
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name', 'profile']
 
     

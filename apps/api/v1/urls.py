@@ -6,6 +6,8 @@ from . import views
 
 router = DefaultRouter()
 router.register('products', views.ProductViewSet)
+router.register('users', views.UserViewset)
+router.register('me', views.UserProfileViewSet)
 
 urlpatterns = router.urls + [
     path('auth/register/', views.RegisterJSONView.as_view(), name='register_json'),
