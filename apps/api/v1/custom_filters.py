@@ -1,6 +1,6 @@
 import django_filters as filters
 from apps.products.models import Product
-
+from apps.products.models import ProductVariant
 class ProductFilter(filters.FilterSet):
     description = filters.CharFilter(field_name='description', lookup_expr='icontains')
     category = filters.CharFilter(field_name='category__name', lookup_expr='icontains')
@@ -15,3 +15,7 @@ class ProductFilter(filters.FilterSet):
     
     def filter_queryset(self, queryset):
         return super().filter_queryset(queryset)
+
+class VariantFilter(filters.FilterSet):
+    model = ProductVariant
+    fields = '__all__'

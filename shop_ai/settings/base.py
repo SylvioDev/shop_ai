@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'social_django',
     'rest_framework',
-    'django_filters'
+    'django_filters',
+    'django_cleanup.apps.CleanupConfig'
 ]
 
 MIDDLEWARE = [
