@@ -5,6 +5,7 @@ from apps.products.models import ProductVariant
 from apps.products.models import ProductImage
 from apps.products.models import VariantImage
 from apps.users.models import UserProfile
+from apps.cart.models import Cart
 from django.contrib.auth.models import User
 from apps.container import container
 import re
@@ -252,4 +253,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'first_name', 'last_name', 'profile']
 
 
-    
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = '__all__'

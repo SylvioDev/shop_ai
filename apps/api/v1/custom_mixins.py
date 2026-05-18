@@ -1,6 +1,10 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.conf import settings
+from apps.cart.models import Cart
+from apps.cart.cart import Cart as cart_session
 
+CART_SESSION_ID = settings.CART_SESSION_ID
 class ImageMixin:
     """
     Mixin providing reusable image upload and deletion actions
@@ -95,3 +99,14 @@ class ImageMixin:
             return Response({"message": "Image deleted"}, status=204)
         except image_model.DoesNotExist:
             return Response({"error": "Image not found"}, status=404)
+        
+class CartMixin:
+    def _get_cart(self, request):
+        db_cart, _ = Cart.objects.get_or_create(user=request.user)
+        fake_session = {CART_SESSION_ID: db_cart.items}
+        cart = cart_session(fake_session)
+        return cart, db_cart, fake_session
+
+    def _save_cart(self, db_cart : Cart, cart_dict : cart_session):
+        db_cart.items = cart_dict
+        db_cart.save()

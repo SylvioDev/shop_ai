@@ -265,13 +265,15 @@ class Cart:
 
         Returns:
             message(str) : 1 if the product exists in cart else None
-
         """
         product_quantity = int(str(product_quantity).strip())
         product_name = str(product_sku).strip()
         cart = self.cart
         if product_name in cart:
-            cart[product_sku]['quantity'] = product_quantity
+            if product_quantity > cart[product_sku]['stock']:
+                cart[product_sku]['quantity'] = cart[product_sku]['stock']
+            else:
+                cart[product_sku]['quantity'] = product_quantity
             self.save()
 
         message = 1 if product_name in self.cart else None

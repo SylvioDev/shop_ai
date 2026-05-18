@@ -28,6 +28,10 @@ from apps.products.models import ProductVariant
 from apps.api.v1.custom_filters import ProductFilter
 from apps.api.v1.custom_filters import VariantFilter
 from .custom_mixins import ImageMixin
+from apps.cart.models import Cart
+from rest_framework.permissions import IsAuthenticated
+from .serializers import CartSerializer
+from .custom_mixins import CartMixin
 class ProductPagination(PageNumberPagination):
     page_size = 3
     max_page_size = 5
@@ -167,5 +171,132 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
     permission_classes = [UserProfilePermission]
-
+class CartView(CartMixin, APIView):
+    """
+    Handles cart operations for authenticated users.
     
+    Supports retrieving, adding, removing, and updating cart items.
+    Cart is persisted in the database via CartMixin helpers.
+    
+    Endpoints:
+        GET    /cart/              → retrieve cart items
+        POST   /cart/              → add product to cart
+        DELETE /cart/              → remove a product from cart
+        PATCH  /cart/              → update product quantity
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = CartSerializer
+
+    def get(self, request):
+        """
+        Retrieve all items in the authenticated user's cart.
+
+        Returns:
+            200: cart items dict
+        """
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+        return Response(cart.items)
+
+    def post(self, request):
+        """
+        Add a product to the cart by SKU.
+
+        Body:
+            product_sku (str): SKU of the product to add
+            quantity (int): desired quantity
+
+        Returns:
+            200: success message
+            400: missing product_sku or quantity
+            404: product SKU not found in database
+        """
+        product_sku = request.data.get('product_sku')
+        quantity = int(request.data.get('quantity'))
+        if not product_sku or not quantity:
+            return Response({'error': 'missing data!'}, status=status.HTTP_400_BAD_REQUEST)
+
+        cart_dict, db_cart ,fake_session = self._get_cart(request)
+        response = cart_dict.add(product_sku, quantity)
+        if 'SKU' in str(response):
+            return Response({'error': str(response)}, status=status.HTTP_404_NOT_FOUND)
+        
+        self._save_cart(db_cart, cart_dict.cart)
+
+        return Response({'message' : f'Product "{product_sku}" added successfully'}, status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        """
+        Remove a product from the cart by SKU.
+
+        Query Params:
+            product_sku (str): SKU of the product to remove
+
+        Returns:
+            200: success message
+            400: missing product_sku
+            404: product not found in cart
+        """
+        product_sku = request.query_params.get('product_sku')
+        if not product_sku:
+            return Response({'error': 'missing data!'}, status=status.HTTP_400_BAD_REQUEST)
+
+        cart_dict, db_cart, fake_session = self._get_cart(request)
+        response = cart_dict.remove(product_sku)
+        
+        if 'exist' in response:
+            return Response({'error': str(response)}, status=status.HTTP_404_NOT_FOUND)
+        
+        self.save_cart(db_cart, cart_dict.cart)
+
+        return Response({'message': response})
+
+    def patch(self, request):
+        """
+        Update the quantity of a product already in the cart.
+
+        Body:
+            product_sku (str): SKU of the product to update
+            quantity (int): new desired quantity
+
+        Returns:
+            200: success message
+            400: missing product_sku or quantity
+            404: product not found in cart
+        """
+        product_sku = request.data.get('product_sku')
+        quantity = int(request.data.get('quantity'))
+
+        if not product_sku or not quantity:
+            return Response({'error': 'missing data!'}, status=status.HTTP_400_BAD_REQUEST)
+
+        cart_dict, db_cart, fake_session = self._get_cart(request)
+        response = cart_dict.update_product_quantity(product_sku, quantity)
+        if response is None:
+            return Response(f'error, there is no product with sku "{product_sku}"', status=status.HTTP_404_NOT_FOUND)
+        
+        self._save_cart(db_cart, cart_dict.cart)
+        
+        return Response({'message':f'Product updated successfully'}, status=status.HTTP_200_OK)
+
+class CartClearView(CartMixin, APIView):
+    """
+    Clears all items from the authenticated user's cart.
+    
+    Typically called after a successful checkout.
+
+    Endpoints:
+        DELETE /cart/clear/  → wipe all cart items
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def delete(self, request):
+        """
+        Remove all products from the cart.
+
+        Returns:
+            200: confirmation message
+        """
+        cart_dict, db_cart, fake_session = self._get_cart(request)
+        cart_dict.clear()
+        self._save_cart(db_cart, cart_dict.cart)
+        return Response({'message' : 'Cart cleared'}, status=status.HTTP_200_OK)

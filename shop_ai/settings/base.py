@@ -29,20 +29,22 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # Application definition
 
 INSTALLED_APPS = [
-    'apps.users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary_storage',  # Only for media files
-    'cloudinary',
+    
     'apps.products',
     'apps.cart',
     'apps.checkout',
     'apps.orders',
     'apps.api',
+    'apps.users.apps.UsersConfig',
+    
+    'cloudinary_storage',  # Only for media files
+    'cloudinary',
     'crispy_forms',
     'crispy_bootstrap5',
     'social_django',

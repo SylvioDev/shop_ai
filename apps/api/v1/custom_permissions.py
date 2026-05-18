@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.permissions import SAFE_METHODS
 
 class ProductPermission(BasePermission):
@@ -27,8 +27,3 @@ class UserPermission(BasePermission):
 class UserProfilePermission(UserPermission):
     def has_object_permission(self, request, view, obj):
         return obj.user == request.user
-    
-
-
-
-        
