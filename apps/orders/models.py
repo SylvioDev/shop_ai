@@ -15,7 +15,6 @@ class Order(models.Model):
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
         ('refunded_insufficient_stock', 'RefundedInsufficientStock'),
-        
     ]
 
     order_number = models.CharField(max_length=255, unique=True, editable=False)

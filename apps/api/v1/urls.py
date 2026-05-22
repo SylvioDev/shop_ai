@@ -9,6 +9,7 @@ router.register('products', views.ProductViewSet)
 router.register('users', views.UserViewset)
 router.register('me', views.UserProfileViewSet)
 router.register('variants', views.ProductVariantViewSet)
+router.register('orders', views.OrderViewSet, basename='order')
 
 urlpatterns = router.urls + [
     path('auth/register/', views.RegisterJSONView.as_view(), name='register_json'),

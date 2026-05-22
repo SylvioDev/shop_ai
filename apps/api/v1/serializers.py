@@ -6,6 +6,8 @@ from apps.products.models import ProductImage
 from apps.products.models import VariantImage
 from apps.users.models import UserProfile
 from apps.cart.models import Cart
+from apps.orders.models import Order
+from apps.orders.models import OrderItem
 from django.contrib.auth.models import User
 from apps.container import container
 import re
@@ -254,6 +256,110 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Cart objects.
+
+    Provides a full representation of the user's cart,
+    including all items stored as a JSON snapshot.
+
+    Meta:
+        model (Cart):
+            The model associated with this serializer.
+        fields (str):
+            All model fields are included:
+            - user: FK to the authenticated user.
+            - items: JSONField containing cart items dict.
+            - updated_at: last modification timestamp.
+    """
     class Meta:
         model = Cart
         fields = '__all__'
+
+class OrderSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Order objects.
+
+    Handles serialization and validation of order data.
+    Exposes financial snapshot fields (subtotal, vat, total)
+    and enforces valid status transitions via validate_status().
+
+    Only the status field is writable after creation —
+    all financial fields are set at order creation and never modified.
+
+    Meta:
+        model (Order):
+            The model associated with this serializer.
+        fields (list[str]):
+            Fields included in the serialized output:
+            - customer_id: FK to the user who placed the order.
+            - status: current order status (pending/paid/cancelled etc.).
+            - subtotal: total before taxes and discounts.
+            - discount_amount: applied discount snapshot.
+            - vat: VAT amount snapshot.
+            - final_total: total amount charged at checkout.
+            - cart: JSONField snapshot of cart at time of order creation.
+    """
+    class Meta:
+        model = Order
+        fields = [
+            'customer_id',
+            'status',
+            'subtotal',
+            'discount_amount',
+            'vat',
+            'final_total',
+            'cart'
+        ]
+
+    def validate_status(self, value):
+        """
+        Validate that the provided status is a recognised order status.
+
+        Accepts only predefined status choices and normalises
+        the value to lowercase before saving.
+
+        Args:
+            value (str): status value from request data.
+
+        Raises:
+            ValidationError: if the provided status is not a valid choice.
+
+        Returns:
+            str: lowercased validated status value.
+        """
+        valid_choices = {
+            'pending':'pending',
+            'paid' : 'Paid',
+            'shipped':'Shipped',
+            'completed' : 'Completed',
+            'cancelled' : 'Cancelled',
+            'refunded_insufficient_stock' : 'RefundedInsufficientStock'
+        }
+        if valid_choices.get(value) is None:
+            raise serializers.ValidationError(f'Invalid status provided')
+        value = value.lower()
+        return value
+    
+    def update(self, instance, validated_data):
+        """
+        Update order status only.
+
+        All other order fields are immutable after creation —
+        only status transitions are permitted via PATCH.
+
+        Args:
+            instance (Order): existing order instance to update.
+            validated_data (dict): validated data from request,
+                expected to contain 'status' only.
+
+        Returns:
+            Order: updated order instance.
+        """
+        instance.status = validated_data.get(
+            'status', 
+            instance.status
+        )
+        instance.save()
+        return instance
+
+    
