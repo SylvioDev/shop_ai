@@ -255,7 +255,7 @@ class CartView(CartMixin, APIView):
         if 'exist' in response:
             return Response({'error': str(response)}, status=status.HTTP_404_NOT_FOUND)
         
-        self.save_cart(db_cart, cart_dict.cart)
+        self._save_cart(db_cart, cart_dict.cart)
 
         return Response({'message': response})
 
@@ -273,19 +273,34 @@ class CartView(CartMixin, APIView):
             404: product not found in cart
         """
         product_sku = request.data.get('product_sku')
-        quantity = int(request.data.get('quantity'))
+        quantity = request.data.get('quantity')
 
         if not product_sku or not quantity:
             return Response({'error': 'missing data!'}, status=status.HTTP_400_BAD_REQUEST)
 
+        try:
+            quantity = int(quantity)
+        except ValueError as error:
+            return Response({'error': f'Please provide a valid quantity number'}, status=status.HTTP_400_BAD_REQUEST)
+        
         cart_dict, db_cart, fake_session = self._get_cart(request)
         response = cart_dict.update_product_quantity(product_sku, quantity)
         if response is None:
-            return Response(f'error, there is no product with sku "{product_sku}"', status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {
+                    'error':f'There is no product with sku "{product_sku}"'
+                }, 
+                status=status.HTTP_404_NOT_FOUND
+            )
         
         self._save_cart(db_cart, cart_dict.cart)
         
-        return Response({'message':f'Product updated successfully'}, status=status.HTTP_200_OK)
+        return Response(
+            {
+                'message':f'Product quantity updated successfully'
+            }, 
+            status=status.HTTP_200_OK
+        )
 
 class CartClearView(CartMixin, APIView):
     """
@@ -308,7 +323,7 @@ class CartClearView(CartMixin, APIView):
         cart_dict, db_cart, fake_session = self._get_cart(request)
         cart_dict.clear()
         self._save_cart(db_cart, cart_dict.cart)
-        return Response({'message' : 'Cart cleared'}, status=status.HTTP_200_OK)
+        return Response({'message' : 'Cart cleared', 'cart': db_cart.items}, status=status.HTTP_200_OK)
     
 class OrderViewSet(CartMixin, viewsets.ModelViewSet):
     """
