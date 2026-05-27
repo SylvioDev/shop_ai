@@ -50,7 +50,9 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework',
     'django_filters',
-    'django_cleanup.apps.CleanupConfig'
+    'django_cleanup.apps.CleanupConfig',
+
+    'drf_spectacular'
 ]
 
 MIDDLEWARE = [
@@ -253,7 +255,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated'
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS' : 'drf_spectacular.openapi.AutoSchema'
 }
 
 from datetime import timedelta
@@ -267,3 +270,22 @@ SIMPLE_JWT = {
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Shop_AI api',
+    'DESCRIPTION': 'A RESful API for shop ai e-commerce platform built with Django REST Framework',
+    'VERSION': '1.0.0',
+    'CONTACT':{'name' : 'SylvioDev', 'email' : 'rakotomangantonio@gmail.com'},
+    'LICENSE' : {'MIT'},
+    
+    # JWT support in Authorize button
+    'SECURITY': [{'Bearer': []}],
+    'COMPONENT_SECURITY_SCHEMES': {
+        'Bearer': {
+            'type': 'http',
+            'scheme': 'bearer',
+            'bearerFormat': 'JWT',
+        }
+    }
+}
