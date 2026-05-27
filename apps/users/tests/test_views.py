@@ -1,4 +1,5 @@
 import pytest
+import re
 from django.core import mail
 from django.urls import reverse
 from apps.users.models import User
@@ -217,7 +218,7 @@ class TestPasswordResetView:
         response = client.get(reset_password_url)
         html = response.content.decode()
         assert response.status_code == 200
-        assert 'Enter your e-mail address below :' in html 
+        assert 'Enter your e-mail address below : ' in html 
 
     def test_password_reset_invalid_fake_email(self, reset_password_url, client, valid_user):
         fake_email = {'email':'fake@email.com'}
@@ -277,7 +278,7 @@ class TestPasswordResetConfirmView:
     def test_password_reset_confirm_get(self, reset_password_url, client, valid_user, get_token_and_user_id):
         response = client.get(reverse('password_reset_confirm', kwargs=get_token_and_user_id))
         assert response.status_code == 200
-        html = response.content.decode()
+        html = response.content.decode('utf-8')
         assert 'New password:' in html
 
     def test_password_reset_confirm_invalid_link_or_expired(self, reset_password_url, client, valid_user, get_token_and_user_id):
@@ -376,9 +377,10 @@ class TestUpdateEmailView:
 
     def test_update_email_get_not_redirected(self, update_email_url, client, valid_user, login_and_verify_user):
         new_response = client.get(update_email_url)
-        html = new_response.content.decode()
+        html = new_response.content.decode('utf-8')
         assert new_response.status_code == 200
         assert 'Enter your new e-mail address below : ' in html
+
             
     def test_update_email_success(self, update_email_url, client, valid_user, login_and_verify_user):
         data = {'new_email':'mail@gmail.com'}

@@ -10,6 +10,7 @@ def token(client, valid_user):
     data = {'username':'test', 'password':'mypassword'}
     output = client.post(reverse('get-token'), data=data).json().get('access')
     return output
+
 @pytest.fixture
 def added_product(client, product, sku, token):
     product.stock = 15

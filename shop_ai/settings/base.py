@@ -29,6 +29,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # Application definition
 
 INSTALLED_APPS = [
+    'apps.users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,7 +42,6 @@ INSTALLED_APPS = [
     'apps.checkout',
     'apps.orders',
     'apps.api',
-    'apps.users.apps.UsersConfig',
     
     'cloudinary_storage',  # Only for media files
     'cloudinary',

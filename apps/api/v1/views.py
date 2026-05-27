@@ -387,15 +387,16 @@ class OrderViewSet(CartMixin, viewsets.ModelViewSet):
             container.checkout_service.add_order_items(order=order, cart=cart_dict.cart)
             return Response(
                 {
-                    'message' : 'Order successfully created',
-                    'data' : serializer.data
+                    'message' : f'Order successfully created',
+                    'data' : serializer.data,
+                    'order_number' : order.order_number
                 },
                 status=status.HTTP_200_OK
             )
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def partial_update(self, request, *args, **kwargs):
+    def partial_update(self, request, order_number=None):
         """
         Simulate a successful payment by transitioning order status to 'paid'.
 
@@ -410,8 +411,7 @@ class OrderViewSet(CartMixin, viewsets.ModelViewSet):
             - order_number does not exist
 
         Args:
-            request.data:
-                order_number (str): unique identifier of the order to pay
+            order_number (str): unique identifier of the order to pay
 
         Returns:
             200: confirmation message
@@ -422,10 +422,6 @@ class OrderViewSet(CartMixin, viewsets.ModelViewSet):
             Payment processing (Stripe) is handled separately in the
             e-commerce website. This endpoint simulates payment success only.
         """
-        order_number = request.data.get('order_number')
-        if not order_number:
-            return Response({'error' : 'You must provide a order_number '}, status=status.HTTP_400_BAD_REQUEST)
-        
         try:
             order = Order.objects.get(order_number=order_number)
             if order.status == 'paid':

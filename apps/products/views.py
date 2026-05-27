@@ -93,8 +93,8 @@ class ProductDetail(DetailView):
     def get(self, request : HttpResponse, slug : str):
         try:
             product = Product.objects.get(slug=slug)
-        except Product.DoesNotExist:
-            return JsonResponse({'message' : f'Product with slug "{slug}" does\'t exist'})
+        except Product.DoesNotExist as error:
+            return JsonResponse({'message' : f'Product with slug "{slug}" doesn\'t exist'})
 
         variants = ProductVariant.objects.filter(product=product)
         attributes = container.product_repo.get_variant_attribute(variants[0].id) if len(variants) > 0 else None
