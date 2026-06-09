@@ -52,3 +52,4 @@ env:
   CLOUD_NAME: fakename
   CLOUDINARY_API_KEY: fakeapikey
   CLOUDINARY_API_SECRET: fakeapisecret
+  DATABASE_URL : postgres://shop_user:database1234@!@localhost:5432/shop_ai

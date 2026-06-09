@@ -25,8 +25,6 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-
-
 class Product(models.Model):
     
     STATUS_CHOICES = [
@@ -89,7 +87,6 @@ class AttributeValue(models.Model):
 
     def __str__(self):
         return f"{self.attribute.name}: {self.value}"
-
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
     sku = models.CharField(max_length=100, unique=True, blank=True)

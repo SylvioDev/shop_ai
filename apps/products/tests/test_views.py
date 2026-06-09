@@ -23,7 +23,7 @@ def active_products(products_lists):
 
 class TestListProductView:
     def test_list_product_get(self, client, product_url, product):
-        response = client.get(product_url)
+        response = client.get('/products/')
         html = response.content.decode('utf-8')
         template_name = response.templates[0].name
         assert response.status_code == 200
@@ -58,17 +58,17 @@ class TestCategoryFilterView:
         
 class TestProductDetailView:
     def test_product_detail_get_success(self, client, product):
-        response = client.get(reverse('product-detail', kwargs={'slug' : product.slug}))
+        response = client.get(reverse('product_detail', kwargs={'slug' : product.slug}))
         template_name = response.templates[0].name
         assert response.status_code == 200
         assert template_name == 'product_detail.html'
 
     def test_product_detail_get_failure(self, client, product):
         invalid_slug = 'invalid product'
-        response = client.get(reverse('product-detail', kwargs={'slug' : invalid_slug}))
-        error = json.loads(response.content.decode())
+        response = client.get(reverse('product_detail', kwargs={'slug' : invalid_slug}))
+        error = json.loads(response.content.decode('utf-8'))
         assert response.status_code == 200
-        assert error['message'] == f'Product with slug "{invalid_slug}" does\'t exist'
+        assert error.get('message') == f'Product with slug "{invalid_slug}" doesn\'t exist'
 
     def test_product_detail_variant(self, client, variant_product, variant_sku):
         response = client.get(reverse('update-variant', kwargs={'product_sku':variant_sku}))

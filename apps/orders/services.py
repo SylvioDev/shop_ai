@@ -52,3 +52,8 @@ class OrderService:
         }
         
         return context
+    
+    def decrease_stocks(self, cart : dict):
+        for sku, product in cart.items():
+            container.checkout_repo.decrease_stock(product_sku=sku, quantity=product.get('quantity'))
+        
